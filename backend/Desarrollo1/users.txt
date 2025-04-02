@@ -1,0 +1,42 @@
+[
+    {
+        "email": "juan.perez@example.com",
+        "password": "password123",
+        "username": "juanperez",
+        "name": "Juan Pérez",
+        "age": 34,
+        "conditions": false
+    },
+    {
+        "email": "maria.lopez@example.com",
+        "password": "securepass",
+        "username": "marialopez",
+        "name": "María López",
+        "age": 60,
+        "conditions": true
+    },
+    {
+        "email": "carlos.gomez@example.com",
+        "password": "12345678",
+        "username": "carlosgomez",
+        "name": "Carlos Gómez",
+        "age": 10,
+        "conditions": false
+    },
+    {
+        "email": "laura.martinez@example.com",
+        "password": "mypassword",
+        "username": "lauramartinez",
+        "name": "Laura Martínez",
+        "age": 50,
+        "conditions": true
+    },
+    {
+        "email": "diego.fernandez@example.com",
+        "password": "diego1234",
+        "username": "diegofernandez",
+        "name": "Diego Fernández",
+        "age": 20,
+        "conditions": false
+    }
+]
