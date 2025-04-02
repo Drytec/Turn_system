@@ -42,9 +42,12 @@ INSTALLED_APPS = [
     'apps.usuario',
     'apps.servicio',
     'apps.turno',
+    'apps.tipo',
+    'apps.puesto',
+    'drf_yasg',
 ]
 
-AUTH_USER_MODEL = 'usuario.User'
+AUTH_USER_MODEL = 'usuario.Users'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
@@ -91,8 +94,15 @@ WSGI_APPLICATION = 'Desarrollo1.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'turn',
+        'USER': 'postgres',
+        'PASSWORD': 'aP4sw0rd',
+        'HOST': 'localhost',
+        'PORT': '5433',
+        'OPTIONS': {
+            'options': '-c client_encoding=UTF8',
+        },
     }
 }
 
@@ -114,7 +124,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+#AUTHENTICATION_BACKENDS = ['backend.EmailAuthBackend']
+TOKEN_EXPIRED_AFTER_SECONDS = 10
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
