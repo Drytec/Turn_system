@@ -9,3 +9,5 @@ pillow~=11.0.0
 colorama~=0.4.6
 pytz~=2024.2
 qrcode~=8.0
+django-rest-swagger
+drf-yasg

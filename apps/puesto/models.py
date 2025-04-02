@@ -1,12 +1,11 @@
 from django.db import models
-from apps.tipo.models import Types
+from ..tipo.models import Types
 
-
-class place(models.Model):
+class Place(models.Model):
     place_id = models.AutoField(primary_key=True)
     place_name = models.CharField(max_length=50)
     place_location = models.CharField(max_length=50)
-    type_id = models.ForeignKey(Types, on_delete=models.CASCADE)
+    type_id = models.ForeignKey(Types, on_delete=models.CASCADE,db_column='type_id')
 
     class Meta:
         db_table = "place"

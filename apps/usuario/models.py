@@ -37,11 +37,10 @@ class Users(AbstractBaseUser):
     age = models.IntegerField(default=0)
     conditions = models.BooleanField(default=False)
     type_id = models.ForeignKey(Types, on_delete=models.CASCADE,db_column='type_id')
-    e_condicion = models.CharField(max_length=150,default='Baja')
+    e_condition = models.CharField(max_length=150,default='Baja')
     last_name = models.CharField(max_length=150)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    condition = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
     objects = UserManager()

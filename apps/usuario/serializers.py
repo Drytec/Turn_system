@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from .models import Users
 from ..tipo.models import Types
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+
 
 #Clase que representa al usuario
 class UserSerializer(serializers.ModelSerializer):
@@ -21,7 +24,8 @@ class UserListSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         return {'Nombre del usuario' : data['name'],
                 'Correo electronico:' : data['email'],
-                'Prioridad': data['e_condicion']}
+                'Prioridad': data['e_condition']}
+
 
 
 class UserCreationSerializer(serializers.ModelSerializer):
@@ -33,43 +37,36 @@ class UserCreationSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        # Agregar valores predeterminados para campos que el usuario NO debe proporcionar
         validated_data['type_id'] =  Types.objects.get(type_id=1)
         if(validated_data['conditions']==True and (validated_data['age']>55 or validated_data['age']<12)):
-            validated_data['e_condicion'] = "maxima"
+            validated_data['e_condition'] = "maxima"
 
         elif ((validated_data['age']>55 or validated_data['age']<12) or validated_data['conditions']==True):
-            validated_data['e_condicion'] = "alta"
+            validated_data['e_condition'] = "alta"
         else:
-            validated_data['e_condicion'] = "estandar"
+            validated_data[('e_condit'
+                            'ion')] = "estandar"
         user = Users.objects.create(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
         return user
 
-
-
-class UserTestSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=100, required=True)
-    name = serializers.CharField(max_length=100)
+class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
-
-    def validate_name(self, value):
-        if 'XXX' in value:
-            raise serializers.ValidationError('Este no es un nombre permitido')
-        return value
-
-    def validate_email(self, value):
-        if value =='':
-            raise serializers.ValidationError('Por Favor dijite un email')
-        return value
+    password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        return data
+        email = data.get("email")
+        password = data.get("password")
 
-    def create(self, validated_data):
-        return  Users.objects.create(**validated_data)
-    def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.email = validated_data.get('email', instance.email)
-        instance.save()
+        if email and password:
+            user = authenticate(username=email, password=password)  # Autenticar por email
+
+            if user:
+                data["user"] = user
+            else:
+                raise serializers.ValidationError("Credenciales inválidas")
+        else:
+            raise serializers.ValidationError("Se requieren email y contraseña")
+
+        return data

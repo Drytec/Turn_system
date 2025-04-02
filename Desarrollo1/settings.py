@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'apps.turno',
     'apps.tipo',
     'apps.puesto',
+    'drf_yasg',
 ]
 
 AUTH_USER_MODEL = 'usuario.Users'
@@ -123,7 +124,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+#AUTHENTICATION_BACKENDS = ['backend.EmailAuthBackend']
+TOKEN_EXPIRED_AFTER_SECONDS = 10
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
