@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.staticfiles',
+    'coreapi',
     'corsheaders',
     'apps.usuario',
     'apps.servicio',
@@ -107,6 +108,7 @@ DATABASES = {
         },
     }
 }
+#Cors authorization
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
