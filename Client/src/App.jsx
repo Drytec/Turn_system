@@ -1,16 +1,11 @@
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
-import {ServiciosPage} from './pages/ServiciosPage';
-import {UsuarioEnterPage} from './pages/UsuarioEnterPage';
-import { Navigation } from './components/Navigation';
+import Login from './pages/Login';
 
 function App() {
   return (
     <BrowserRouter>
-    <Navigation/>
       <Routes>
-        <Route path="/" element={<Navigate to="/usuario-enter" />} />
-        <Route path="/usuario-enter" element={<UsuarioEnterPage />} />
-        <Route path="/servicios" element={<ServiciosPage />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );

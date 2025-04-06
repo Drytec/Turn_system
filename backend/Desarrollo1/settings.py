@@ -110,10 +110,10 @@ DATABASES = {
 }
 #Cors authorization
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:5173",
 ]
 CORS_ORIGINS_WHITELIST = [
-    "http://localhost:3000",
+    "http://localhost:5173",
 ]
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
