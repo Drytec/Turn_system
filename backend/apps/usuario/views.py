@@ -46,13 +46,8 @@ def UserExplain(request, pk):
 
 class Login(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
-
-        user = authenticate(username="lauramartinez", password="mypassword")
-        #loginSerializer = LoginSerializer(data=request.data)
         loginSerializer = self.serializer_class(data=request.data, context={'request': request})
-        print(loginSerializer)
         if loginSerializer.is_valid():
-
             user = loginSerializer.validated_data['user']
             userSerializer=UserListSerializer(user)
             if user.is_authenticated:
@@ -79,6 +74,7 @@ class Login(ObtainAuthToken):
                 return Response({"error": "Usuario no puede ingresar"}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             print("ewreororo")
+            print(loginSerializer.data)
             return Response(loginSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Logout(APIView):
