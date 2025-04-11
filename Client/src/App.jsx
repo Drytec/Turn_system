@@ -1,8 +1,9 @@
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import Login from './pages/Login';
-import Servicios from './pages/Servicios';
+import Puestos from './pages/Puestos';
 import WelcomePage from './pages/WelcomePage';
 import Register from './pages/Register';
+import Turno from './pages/Turno';
 
 function App() {
   return (
@@ -10,8 +11,9 @@ function App() {
       <Routes>
         <Route path="/" element={<WelcomePage />}/>
         <Route path="/login" element={<Login />} />
-        <Route path="/servicios" element={<Servicios />}/>
+        <Route path="/puestos" element={<Puestos />}/>
         <Route path="/registro" element={<Register />}/>
+        <Route path="/turno" element={<Turno />}/>
       </Routes>
     </BrowserRouter>
   );

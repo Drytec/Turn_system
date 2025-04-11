@@ -22,7 +22,8 @@ class UserListSerializer(serializers.ModelSerializer):
         fields = '__all__'
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        return {'Nombre del usuario' : data['name'],
+        return {'user_id': data['user_id'],
+                'Nombre del usuario' : data['name'],
                 'Correo electronico:' : data['email'],
                 'Prioridad': data['e_condition']}
 

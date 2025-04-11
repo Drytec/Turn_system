@@ -16,7 +16,8 @@ const Login = () => {
       console.log('Login exitoso:', data);
       alert('¡Bienvenido ' + data.user.name + '!');
       localStorage.setItem('token', data.token);
-      navigate('/servicios');
+      localStorage.setItem('user_id', data.user.user_id)
+      navigate('/puestos');
     } catch (error) {
       console.error('Error al iniciar sesión:', error.response?.data || error.message);
       alert('Credenciales incorrectas');
