@@ -37,4 +37,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.usuario.urls')),
     path('place/',include('apps.puesto.routers')),
+    path('place/',include('apps.puesto.urls')),
+    path('turn/',include('apps.turno.urls')),
+    path('service/',include('apps.servicio.urls')),
+    path('service/',include('apps.servicio.routers')),
 ]

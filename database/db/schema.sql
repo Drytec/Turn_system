@@ -42,11 +42,20 @@ CREATE TABLE place (
         type_id INTEGER NOT NULL,
         FOREIGN KEY (type_id) REFERENCES types(type_id) ON DELETE CASCADE
 );
+CREATE TABLE place_service (
+    ps_id SERIAL PRIMARY KEY ,
+    place_id INTEGER NOT NULL ,
+    service_id INTEGER NOT NULL ,
+    FOREIGN KEY (place_id) REFERENCES place(place_id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES service(service_id) ON DELETE CASCADE
+);
 CREATE TABLE turn (
     turn_id SERIAL PRIMARY KEY,
     turn_num INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     place_id INTEGER NOT NULL ,
+    service_id INTEGER NOT NULL ,
+    FOREIGN KEY (service_id) REFERENCES service(service_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (place_id) REFERENCES place(place_id) ON DELETE CASCADE
 );

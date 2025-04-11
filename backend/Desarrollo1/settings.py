@@ -133,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 #AUTHENTICATION_BACKENDS = ['backend.EmailAuthBackend']
-TOKEN_EXPIRED_AFTER_SECONDS = 10
+TOKEN_EXPIRED_AFTER_SECONDS = 100
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
