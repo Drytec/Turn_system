@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { getServices } from '../api/services'; // ajusta la ruta si es necesario
 
 const Servicios = () => {
   const [servicios, setServicios] = useState([]);
@@ -8,37 +9,11 @@ const Servicios = () => {
   useEffect(() => {
     const fetchServicios = async () => {
       try {
-        // Simulación de datos (reemplaza con tu backend real)
-        const response = await new Promise((resolve) =>
-          setTimeout(
-            () =>
-              resolve({
-                data: [
-                  {
-                    id: 1,
-                    nombre: 'Diseño Web',
-                    descripcion: 'Diseñamos sitios modernos, intuitivos y adaptables.',
-                  },
-                  {
-                    id: 2,
-                    nombre: 'Branding & Identidad',
-                    descripcion: 'Creamos marcas coherentes, memorables y con propósito.',
-                  },
-                  {
-                    id: 3,
-                    nombre: 'Automatización',
-                    descripcion: 'Optimizamos tus procesos usando herramientas digitales.',
-                  },
-                ],
-              }),
-            1000
-          )
-        );
-
-        setServicios(response.data);
-        setLoading(false);
+        const data = await getServices();
+        setServicios(data);
       } catch (error) {
         console.error('Error al cargar servicios:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -53,10 +28,13 @@ const Servicios = () => {
         <p style={styles.loading}>Cargando servicios...</p>
       ) : (
         <div style={styles.column}>
-          {servicios.map((servicio) => (
-            <div key={servicio.id} style={styles.card}>
-              <h2 style={styles.title}>{servicio.nombre}</h2>
-              <p style={styles.description}>{servicio.descripcion}</p>
+          {servicios.map((servicio, index) => (
+            <div key={index} style={styles.card}>
+              <h2 style={styles.title}>{servicio['tipo del servicio']}</h2>
+              <p style={styles.description}>{servicio['Descripcion del servicio']}</p>
+              <p style={{ fontStyle: 'italic', color: '#777' }}>
+                Categoría: {servicio['Categoria del servicio']}
+              </p>
             </div>
           ))}
         </div>
@@ -67,6 +45,7 @@ const Servicios = () => {
 
 export default Servicios;
 
+// estilos iguales que antes...
 const styles = {
   wrapper: {
     maxWidth: '600px',

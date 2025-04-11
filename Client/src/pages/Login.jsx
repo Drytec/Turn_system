@@ -19,8 +19,8 @@ const Login = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Iniciar sesión</h2>
+    <div style={styles.wrapper}>
+      <h1 style={styles.heading}>Iniciar sesión</h1>
       <form style={styles.form} onSubmit={handleSubmit}>
         <input
           type="text"
@@ -45,38 +45,42 @@ const Login = () => {
 export default Login;
 
 const styles = {
-    container: {
-      width: '100%',
-      maxWidth: '400px',
-      margin: '100px auto',
-      padding: '2rem',
-      border: '1px solid #ddd',
-      borderRadius: '8px',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-      backgroundColor: '#fff',
-    },
-    title: {
-      textAlign: 'center',
-      marginBottom: '1.5rem',
-    },
-    form: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '1rem',
-    },
-    input: {
-      padding: '0.75rem',
-      fontSize: '1rem',
-      borderRadius: '4px',
-      border: '1px solid #ccc',
-    },
-    button: {
-      padding: '0.75rem',
-      fontSize: '1rem',
-      backgroundColor: '#3498db',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer',
-    },
-  };
+  wrapper: {
+    maxWidth: '400px',
+    margin: '0 auto',
+    padding: '3rem 1.5rem',
+    fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`,
+    textAlign: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+    border: '1px solid #e0e0e0',
+    marginTop: '80px',
+  },
+  heading: {
+    fontSize: '2rem',
+    marginBottom: '2rem',
+    color: '#2c3e50',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.2rem',
+  },
+  input: {
+    padding: '0.8rem',
+    fontSize: '1rem',
+    borderRadius: '8px',
+    border: '1px solid #ccc',
+  },
+  button: {
+    padding: '0.8rem',
+    fontSize: '1rem',
+    backgroundColor: '#2c3e50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
+  },
+};
