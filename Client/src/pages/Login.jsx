@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { getLogin } from '../api/login';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -12,6 +16,7 @@ const Login = () => {
       console.log('Login exitoso:', data);
       alert('¡Bienvenido ' + data.user.name + '!');
       localStorage.setItem('token', data.token);
+      navigate('/servicios');
     } catch (error) {
       console.error('Error al iniciar sesión:', error.response?.data || error.message);
       alert('Credenciales incorrectas');
