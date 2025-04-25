@@ -6,7 +6,9 @@ const api = axios.create({
 
 export const getPuestos = async () => {
   try {
-    const response = await api.get('/place/');  // Usa la ruta correcta del backend
+    const response = await api.get('/place/');
+    console.log('Datos de puestos:', response.data); 
+     // Usa la ruta correcta del backend
     return response.data;
   } catch (error) {
     console.error('Error al obtener puestos:', error);

@@ -43,6 +43,7 @@ class PlaceCreateSerializer(serializers.ModelSerializer):
         services = PlaceService.objects.filter(place=instance)
         service_data = [
             {
+                "service_id": s.service.service_id,
                 "tipo": s.service.service_type,
                 "descripcion": s.service.service_description,
             }
@@ -50,6 +51,7 @@ class PlaceCreateSerializer(serializers.ModelSerializer):
         ]
 
         return {
+            'place_id': instance.place_id,
             'Nombre del lugar': instance.place_name,
             'Ubicación': instance.place_location,
             'Tipo de lugar': instance.type_id.type_rol if instance.type_id else '',

@@ -19,21 +19,27 @@ const Puestos = () => {
       return;
     }
 
+    console.log("Servicio recibido:", servicio);
+    console.log("Puesto recibido:", place);
+
     const turnoData = {
       user_id: userId,
       place_id: place.place_id,
       service_id: servicio.service_id,
       turn_num: Math.floor(Math.random() * 1000),
     };
+
+    console.log(turnoData);
   
     const result = await crearTurno(turnoData);
-  
+    
+    console.log('Lugar seleccionado:', place);
     if (result.success) {
       navigate('/turno', {
         state: {
           turn_num: turnoData.turn_num,
           servicio: servicio.tipo,
-          lugar: place.place_name,
+          lugar: place['Nombre del lugar'],
         },
       });
     } else {
@@ -45,6 +51,7 @@ const Puestos = () => {
     const fetchPuestos = async () => {
       try {
         const data = await getPuestos();
+        console.log('Puestos:', data);
         setPuestos(data);
       } catch (error) {
         console.error('Error al cargar puestos:', error);
