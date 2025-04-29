@@ -52,18 +52,20 @@ class CreateTurnAPIView(APIView):
         serializer = TurnSerializer(data=request.data)
 
         if serializer.is_valid():
-            owner = serializer.validated_data.get('owner')
-            service = serializer.validated_data.get('service_id')
-            place = serializer.validated_data.get('place_id')
+            owner_id = serializer.validated_data.get('owner')
+            service_id = serializer.validated_data.get('service_id')
+            place_id = serializer.validated_data.get('place_id')
 
-            if not owner or not service or not place:
+            if not owner_id or not service_id or not place_id:
                 return Response({'message': 'Faltan datos obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            owner = User.objects.filter(user_id=owner_id).first(9)
 
             if not owner:
                 return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
             turn_count = Turn.objects.filter(
-                service_id=service, place_id=place).count()
+                service_id=service_id, place_id=place_id).count()
 
             turn_number = turn_count % 1000
 
