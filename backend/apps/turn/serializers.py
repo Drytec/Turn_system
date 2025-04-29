@@ -10,8 +10,3 @@ class TurnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Turn
         fields = '__all__'
-    def to_representation(self, instance):
-        return {
-            'Numero del turno': instance.turn_num,
-            'Prioridad del turno': instance.user_id.e_condition
-        }

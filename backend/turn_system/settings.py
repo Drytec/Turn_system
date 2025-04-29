@@ -29,14 +29,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'drf_yasg',
-    #'apps.user',
+    # 'apps.user',
     'apps.place',
-    #'apps.turn',
-    #'apps.role',
+    # 'apps.turn',
+    # 'apps.role',
     'apps.service',
 ]
 
-#UTH_USER_MODEL = 'user.User'
+# UTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
@@ -62,8 +62,7 @@ ROOT_URLCONF = 'turn_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ticket_system.wsgi.application'
+WSGI_APPLICATION = 'turn_system.wsgi.application'
 
 
 # Database
@@ -118,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-#AUTHENTICATION_BACKENDS = ['backend.EmailAuthBackend']
+# AUTHENTICATION_BACKENDS = ['backend.EmailAuthBackend']
 TOKEN_EXPIRED_AFTER_SECONDS = 100
 
 # Internationalization

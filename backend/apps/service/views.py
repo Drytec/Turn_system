@@ -1,8 +1,6 @@
-from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
 from .serializers import ServiceSerializer
 from .models import Service
 
@@ -10,40 +8,54 @@ from .models import Service
 class ServiceListAPIView(APIView):
     def get(self, request):
         services = Service.objects.all()
-        services_serializer = ServiceSerializer(services, many=True)
-        
-        return Response(services_serializer.data, status=status.HTTP_200_OK)
-    
+        serializer = ServiceSerializer(services, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def post(self, request):
-        service_serializer = ServiceSerializer(data=request.data)
-        
-        if service_serializer.is_valid():
-            service_serializer.save()
-            
-            return Response(service_serializer.data, status=status.HTTP_201_CREATED)
-        
-        return Response(service_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ServiceSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ServiceDetailAPIView(APIView):
+    def get_service(self, pk):
+        return Service.objects.filter(service_id=pk).first()
+
     def get(self, request, pk):
-        service = get_object_or_404(Service, pk=pk)
-        service_serializer = ServiceSerializer(service)
-        
-        return Response(service_serializer.data)
-    
+        service = self.get_service(pk)
+        serializer = ServiceSerializer(service)
+
+        if not service:
+            return Response({'message:' 'Servicio no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def put(self, request, pk):
-        service = get_object_or_404(Service, pk=pk)
-        service_serializer = ServiceSerializer(service, data=request.data)
-        
-        if service_serializer.is_valid():
-            service_serializer.save()
-            
-            return Response(service_serializer.data, status=status.HTTP_200_OK)
-        
-        return Response(service_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+        service = self.get_service(pk)
+        serializer = ServiceSerializer(service, data=request.data)
+
+        if not service:
+            return Response({'message:' 'Servicio no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, pk):
-        service = get_object_or_404(Service, pk=pk)
-        service.delete
-        
-        return Response({'message': 'Servicio Eliminado.'}, status=status.HTTP_200_OK)
+        service = self.get_service(pk)
+
+        if service:
+            service.delete()
+
+            return Response({'message': 'Servicio Eliminado.'}, status=status.HTTP_200_OK)
+
+        return Response({'message:' 'Servicio no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
