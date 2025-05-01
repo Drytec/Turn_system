@@ -11,3 +11,4 @@ pytz~=2024.2
 qrcode~=8.0
 django-rest-swagger
 drf-yasg
+djangorestframework-simplejwt

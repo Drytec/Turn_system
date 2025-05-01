@@ -13,7 +13,5 @@ class TurnSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         return {
             'Numero del turno': instance.turn_num,
-            'Prioridad del turno': instance.user_id.e_condicion
-
-
+            'Prioridad del turno': instance.user_id.e_condition
         }

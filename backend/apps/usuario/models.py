@@ -1,7 +1,7 @@
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from apps.tipo.models import Types
+from ..tipo.models import Types
 
 class UserManager(BaseUserManager):
     def _create_user(self, username, email, name, last_name, password, is_staff, is_superuser, **extra_fields):
@@ -28,16 +28,15 @@ class UserManager(BaseUserManager):
     def create_superuser(self, username, email, name, last_name, password=None, **extra_fields):
         return self._create_user(username, email, name, last_name, password, is_staff=True, is_superuser=True, **extra_fields)
 
-class Users(AbstractBaseUser):
+class CustomUser(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=150)
-    username = models.CharField(unique=True, max_length=150)
     name = models.CharField(max_length=150)
     age = models.IntegerField(default=0)
-    conditions = models.BooleanField(default=False)
+    condition = models.BooleanField(default=False)
     type_id = models.ForeignKey(Types, on_delete=models.CASCADE,db_column='type_id')
-    e_condition = models.CharField(max_length=150,default='Baja')
+    priority = models.CharField(max_length=150,default='Baja')
     last_name = models.CharField(max_length=150)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -45,7 +44,7 @@ class Users(AbstractBaseUser):
 
     objects = UserManager()
     class Meta:
-        db_table = "users"
+        db_table = "customuser"
         managed = False
 
     USERNAME_FIELD = 'email'
