@@ -61,6 +61,9 @@ class TurnAPIView(APIView):
             # owner_id = serializer.validated_data.get('owner')
             place_id = serializer.validated_data.get('place_id')
 
+            # if not owner_id or not place_id:
+            # return Response({'message': 'Faltan datos obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
+
             if not place_id:
                 return Response({'message': 'Faltan datos obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
 

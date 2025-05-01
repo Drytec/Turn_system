@@ -40,6 +40,7 @@ CREATE TABLE turn (
     turn_name VARCHAR(4) NOT NULL,
     active BOOLEAN DEFAULT TRUE,
     attended_by INTEGER NULL,
+    --owner INTEGER NOT NULL,
     owner INTEGER NULL,
     place_id INTEGER NOT NULL,
     date_created TIMESTAMP,
