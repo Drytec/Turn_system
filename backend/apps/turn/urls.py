@@ -5,7 +5,7 @@ from .views import TurnAPIView, CloseTurnAPIView, TurnStatsAPIView, NextTurnAPIV
 urlpatterns = [
     # path('user_turns/<int:uid>', UserTurnsAPIView.as_view(), name='user_turns'),
     path('', TurnAPIView.as_view(), name='turns'),
-    path('close_turn/<int:uid>/<int:pid>',
+    path('close_turn/<int:uid>/<int:tid>',
          CloseTurnAPIView.as_view(), name='close_turn'),
     path('stats/', TurnStatsAPIView.as_view(), name='turn_stats'),
     # path('user_active_turn/<int:uid>', UserActiveTurnAPIView.as_view(), name='user_active_turn'),

@@ -64,14 +64,14 @@ from .serializers import TurnSerializer, CreateTurnSerializer
 
 
 class CloseTurnAPIView(APIView):
-    def get_turn(self, pid):
-        return Turn.objects.filter(turn_id=pid).first()
+    def get_turn(self, tid):
+        return Turn.objects.filter(turn_id=tid).first()
 
     # def get_user(self, uid):
         # return User.objects.filter(user_id=uid).first()
 
-    def put(self, request, uid, pid):
-        turn = self.get_turn(pid)
+    def put(self, request, uid, tid):
+        turn = self.get_turn(tid)
         # attended_by = self.get_user(uid)
 
         if not turn:
