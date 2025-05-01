@@ -1,4 +1,4 @@
-from .serializers import PlaceSerializer
+from .serializers import PlaceSerializer, PlaceGETSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,7 +8,7 @@ from .models import Place
 class PlaceListAPIView(APIView):
     def get(self, request):
         places = Place.objects.all()
-        serializer = PlaceSerializer(places, many=True)
+        serializer = PlaceGETSerializer(places, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -31,7 +31,7 @@ class PlaceDetailAPIView(APIView):
         place = self.get_place(pk)
 
         if place:
-            serializer = PlaceSerializer(place)
+            serializer = PlaceGETSerializer(place)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
 

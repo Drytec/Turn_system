@@ -1,9 +1,12 @@
 from rest_framework import serializers
 from .models import Turn
-from ..place.serializers import PlaceSerializer
-from ..service.serializers import ServiceSerializer
-from ..user.serializers import UserListSerializer
-from rest_framework import status
+
+
+class CreateTurnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Turn
+        # fields = ['owner', 'place_id']
+        fields = ['place_id']
 
 
 class TurnSerializer(serializers.ModelSerializer):

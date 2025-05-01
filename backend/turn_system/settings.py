@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     # 'apps.user',
     'apps.place',
-    # 'apps.turn',
+    'apps.turn',
     # 'apps.role',
     'apps.service',
 ]

@@ -3,6 +3,6 @@ from .views import ServiceListAPIView, ServiceDetailAPIView
 
 
 urlpatterns = [
-    path('services/', ServiceListAPIView.as_view(), name='services'),
+    path('', ServiceListAPIView.as_view(), name='services'),
     path('services/<int:pk>', ServiceDetailAPIView.as_view(), name='service_detail'),
 ]

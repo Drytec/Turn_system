@@ -1,8 +1,10 @@
 from django.urls import path
-from .views import UserTurnsAPIView, CreateTurnAPIView, CloseTurnAPIView
+from .views import TurnAPIView, CloseTurnAPIView, TurnStatsAPIView
+
 
 urlpatterns = [
-    path('turns/<int:pk>', UserTurnsAPIView.as_view(), name='user_turns'),
-    path('create_turn/', CreateTurnAPIView.as_view(), name='create_turn'),
-    path('close_turn/<int:pk>', CloseTurnAPIView.as_view(), name='close_turn')
+    # path('turns/<int:pk>', UserTurnsAPIView.as_view(), name='user_turns'),
+    path('', TurnAPIView.as_view(), name='turns'),
+    path('close_turn/<int:pk>', CloseTurnAPIView.as_view(), name='close_turn'),
+    path('stats/', TurnStatsAPIView.as_view(), name='turn_stats'),
 ]

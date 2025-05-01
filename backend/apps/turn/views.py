@@ -1,16 +1,15 @@
-from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
-from django.contrib.sessions.models import Session
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
 from rest_framework import status
-from ..user.models import User
+from django.db.models import Count
+from django.utils import timezone
+# from ..user.models import User
 from .models import Turn
-from .serializers import TurnSerializer
+from ..place.models import Place
+from .serializers import TurnSerializer, CreateTurnSerializer
 
 
-class UserTurnsAPIView(APIView):
+"""class UserTurnsAPIView(APIView):
     def get_user(self, pk):
         return User.objects.filter(user_id=pk).first()
 
@@ -26,7 +25,7 @@ class UserTurnsAPIView(APIView):
         if turns.exists():
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response({'message': 'No se encontraron turnos.'}, status=status.HTTP_200_OK)
+        return Response({'message': 'No se encontraron turnos.'}, status=status.HTTP_200_OK)"""
 
 
 class CloseTurnAPIView(APIView):
@@ -40,6 +39,7 @@ class CloseTurnAPIView(APIView):
             return Response({'message': 'Turno no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
         turn.active = False
+        turn.date_closed = timezone.now()
         turn.save
 
         serializer = TurnSerializer(turn)
@@ -47,29 +47,34 @@ class CloseTurnAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CreateTurnAPIView(APIView):
+class TurnAPIView(APIView):
+    def get(self, request):
+        turns = Turn.objects.all()
+        serializer = TurnSerializer(turns, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def post(self, request):
-        serializer = TurnSerializer(data=request.data)
+        serializer = CreateTurnSerializer(data=request.data)
 
         if serializer.is_valid():
-            owner_id = serializer.validated_data.get('owner')
-            service_id = serializer.validated_data.get('service_id')
+            # owner_id = serializer.validated_data.get('owner')
             place_id = serializer.validated_data.get('place_id')
 
-            if not owner_id or not service_id or not place_id:
+            if not place_id:
                 return Response({'message': 'Faltan datos obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            owner = User.objects.filter(user_id=owner_id).first(9)
+            # owner = User.objects.filter(user_id=owner_id).first(9)
 
-            if not owner:
-                return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            # if not owner:
+                # return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
             turn_count = Turn.objects.filter(
-                service_id=service_id, place_id=place_id).count()
+                place_id=place_id).count()
 
-            turn_number = turn_count % 1000
+            turn_number = (turn_count % 999) + 1
 
-            turn_name = f"{owner.priority}{turn_number:03d}"
+            turn_name = f"A{turn_number:03d}"
 
             turn = serializer.save(turn_name=turn_name)
 
@@ -78,3 +83,23 @@ class CreateTurnAPIView(APIView):
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TurnStatsAPIView(APIView):
+    def get(self, request):
+        stats = (
+            Place.objects
+            .annotate(turn_count=Count('turn', distinct=True))
+            .values('place_name', 'turn_count')
+            .order_by('place_name')
+        )
+
+        data = [
+            {
+                'place_name': entry['place_name'],
+                'turn_count': entry['turn_count']
+            }
+            for entry in stats
+        ]
+
+        return Response(data, status=status.HTTP_200_OK)
