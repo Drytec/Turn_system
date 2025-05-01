@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Count
 from django.utils import timezone
+from datetime import timedelta
 # from ..user.models import User
 from .models import Turn
 from ..place.models import Place
@@ -26,6 +27,40 @@ from .serializers import TurnSerializer, CreateTurnSerializer
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response({'message': 'No se encontraron turnos.'}, status=status.HTTP_200_OK)"""
+
+
+"""class UserActiveTurnAPIView(APIView):
+    def get_user(self, pk):
+        return User.objects.filter(user_id=pk).first()
+
+    def get(self, request, pk):
+        user = self.get_user(pk)
+
+        if not user:
+            return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        turn = Turn.objects.filter(owner=user, active=True).first()
+
+        if not turn:
+            return Response({'message': 'No tiene turno activo.'}, status=status.HTTP_200_OK)
+
+        time_eight_hours_ago = timezone.now() - timedelta(hours=8)
+
+        past_turns = Turn.objects.filter(
+            active=False,
+            place_id=turn.place_id,
+            date_created__gte=time_eight_hours_ago,
+        )
+
+        if past_turns.exists():
+            total_minutes = sum(t.turn_attended_time for t in past_turns)
+            expected_minutes = round(total_minutes / past_turns.count(), 2)
+        else:
+            expected_minutes = 5.0
+
+        serializer = TurnSerializer(turn)
+
+        return Response({**serializer.data, 'expected_attendacy_time': expected_minutes}, status=status.HTTP_200_OK)"""
 
 
 class CloseTurnAPIView(APIView):
@@ -75,9 +110,15 @@ class TurnAPIView(APIView):
             turn_count = Turn.objects.filter(
                 place_id=place_id).count()
 
+            # turn_priority = owner.priority
+
             turn_number = (turn_count % 999) + 1
 
-            turn_name = f"A{turn_number:03d}"
+            # turn_name = f"{turn_priority}-{turn_number}"
+
+            turn_name = f"A-{turn_number:03d}"
+
+            # turn = serializer.save(turn_priority=turn_priority, turn_name=turn_name)
 
             turn = serializer.save(turn_name=turn_name)
 
@@ -90,19 +131,58 @@ class TurnAPIView(APIView):
 
 class TurnStatsAPIView(APIView):
     def get(self, request):
-        stats = (
-            Place.objects
-            .annotate(turn_count=Count('turn', distinct=True))
-            .values('place_name', 'turn_count')
-            .order_by('place_name')
-        )
+        places = Place.objects.all()
 
-        data = [
-            {
-                'place_name': entry['place_name'],
-                'turn_count': entry['turn_count']
-            }
-            for entry in stats
-        ]
+        data = []
+
+        for place in places:
+            past_turns = Turn.objects.filter(place_id=place, active=False)
+
+            if past_turns.exists():
+                total_minutes = sum(t.turn_attended_time for t in past_turns)
+                avg_time = round(total_minutes / past_turns.count(), 2)
+            else:
+                avg_time = "Desconocido"
+
+            active_turn_count = Turn.objects.filter(
+                place_id=place, active=True).count()
+            closed_turn_count = past_turns.count()
+            total_turn_count = active_turn_count + closed_turn_count
+
+            data.append({
+                'place_name': place.place_name,
+                'total_turn_count': total_turn_count,
+                'active_turn_count': active_turn_count,
+                'closed_turn_count': closed_turn_count,
+                'avg_attendancy_time': avg_time
+            })
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class NextTurnAPIView(APIView):
+    def get_place(self, pk):
+        return Place.objects.filter(place_id=pk).first()
+
+    def get(self, request, pk):
+        place = self.get_place(pk)
+
+        if not place:
+            return Response({'message:' 'Punto no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        for priority in ['H', 'M', 'L']:
+            turn = Turn.objects.filter(
+                place_id=place,
+                active=True,
+                turn_priority=priority
+            ).order_by('date_created').first()
+
+            if turn:
+                turn.active = False
+                turn.date_closed = timezone.now()
+                turn.save()
+
+                serializer = TurnSerializer(turn)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response({'message': 'No hay turnos activos.'}, status=status.HTTP_200_OK)

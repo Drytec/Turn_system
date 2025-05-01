@@ -6,7 +6,8 @@ from django.db import models
 # Create your models here.
 class Turn(models.Model):
     turn_id = models.AutoField(primary_key=True)
-    turn_name = models.CharField(max_length=4)
+    turn_name = models.CharField(max_length=5)
+    turn_priority = models.CharField(max_length=1)
     active = models.BooleanField(default=True)
     # attended_by = models.ForeignKey(
     # User, on_delete=models.CASCADE, db_column='attended_by', null=True)
@@ -16,6 +17,13 @@ class Turn(models.Model):
         Place, on_delete=models.CASCADE, db_column='place_id')
     date_created = models.DateTimeField(auto_now_add=True)
     date_closed = models.DateTimeField(null=True)
+
+    @property
+    def turn_attended_time(self):
+        if self.date_closed and self.date_created:
+            delta = self.date_closed - self.date_created
+            return round(delta.total_seconds() / 60, 2)
+        return 0.0
 
     class Meta:
         db_table = 'turn'

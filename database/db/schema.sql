@@ -37,7 +37,8 @@ CREATE TABLE place (
 
 CREATE TABLE turn (
     turn_id SERIAL PRIMARY KEY,
-    turn_name VARCHAR(4) NOT NULL,
+    turn_name VARCHAR(5) NOT NULL,
+    turn_priority CHAR NOT NULL,
     active BOOLEAN DEFAULT TRUE,
     attended_by INTEGER NULL,
     --owner INTEGER NOT NULL,
