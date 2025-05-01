@@ -11,11 +11,11 @@ from .serializers import TurnSerializer, CreateTurnSerializer
 
 
 """class UserTurnsAPIView(APIView):
-    def get_user(self, pk):
-        return User.objects.filter(user_id=pk).first()
+    def get_user(self, uid):
+        return User.objects.filter(user_id=uid).first()
 
-    def get(self, request, pk):
-        owner = self.get_user(pk)
+    def get(self, request, uid):
+        owner = self.get_user(uid)
 
         if not owner:
             return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
@@ -30,11 +30,11 @@ from .serializers import TurnSerializer, CreateTurnSerializer
 
 
 """class UserActiveTurnAPIView(APIView):
-    def get_user(self, pk):
-        return User.objects.filter(user_id=pk).first()
+    def get_user(self, uid):
+        return User.objects.filter(user_id=uid).first()
 
-    def get(self, request, pk):
-        user = self.get_user(pk)
+    def get(self, request, uid):
+        user = self.get_user(uid)
 
         if not user:
             return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
@@ -64,16 +64,24 @@ from .serializers import TurnSerializer, CreateTurnSerializer
 
 
 class CloseTurnAPIView(APIView):
-    def get_turn(self, pk):
-        return Turn.objects.filter(turn_id=pk).first()
+    def get_turn(self, pid):
+        return Turn.objects.filter(turn_id=pid).first()
 
-    def put(self, request, pk):
-        turn = self.get_turn(pk)
+    # def get_user(self, uid):
+        # return User.objects.filter(user_id=uid).first()
+
+    def put(self, request, uid, pid):
+        turn = self.get_turn(pid)
+        # attended_by = self.get_user(uid)
 
         if not turn:
             return Response({'message': 'Turno no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
+        # if not attended_by:
+            # return Response({'message': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
         turn.active = False
+        # turn.attended_by = attended_by
         turn.date_closed = timezone.now()
         turn.save
 
@@ -161,14 +169,21 @@ class TurnStatsAPIView(APIView):
 
 
 class NextTurnAPIView(APIView):
-    def get_place(self, pk):
-        return Place.objects.filter(place_id=pk).first()
+    def get_place(self, pid):
+        return Place.objects.filter(place_id=pid).first()
 
-    def get(self, request, pk):
-        place = self.get_place(pk)
+    # def get_user(self, uid):
+        # return User.objects.filter(user_id=uid).first()
+
+    def get(self, request, uid, pid):
+        place = self.get_place(pid)
+        # attended_by = self.get_user(uid)
 
         if not place:
             return Response({'message:' 'Punto no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # if not attended_by:
+            # return Response({'message:' 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
         for priority in ['H', 'M', 'L']:
             turn = Turn.objects.filter(
@@ -179,6 +194,7 @@ class NextTurnAPIView(APIView):
 
             if turn:
                 turn.active = False
+                # turn.attended_by = attended_by
                 turn.date_closed = timezone.now()
                 turn.save()
 

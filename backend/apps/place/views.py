@@ -24,11 +24,11 @@ class PlaceListAPIView(APIView):
 
 
 class PlaceDetailAPIView(APIView):
-    def get_place(self, pk):
-        return Place.objects.filter(place_id=pk).first()
+    def get_place(self, pid):
+        return Place.objects.filter(place_id=pid).first()
 
-    def get(self, request, pk):
-        place = self.get_place(pk)
+    def get(self, request, pid):
+        place = self.get_place(pid)
 
         if place:
             serializer = PlaceGETSerializer(place)
@@ -37,8 +37,8 @@ class PlaceDetailAPIView(APIView):
 
         return Response({'message:' 'Punto de Atención no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request, pk):
-        place = self.get_place(pk)
+    def put(self, request, pid):
+        place = self.get_place(pid)
         serializer = PlaceSerializer(place, data=request.data)
 
         if place:
@@ -51,8 +51,8 @@ class PlaceDetailAPIView(APIView):
 
         return Response({'message:' 'Punto de Atención no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
-    def delete(self, request, pk):
-        place = self.get_place(pk)
+    def delete(self, request, pid):
+        place = self.get_place(pid)
 
         if place:
             place.delete()

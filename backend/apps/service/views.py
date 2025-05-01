@@ -24,11 +24,11 @@ class ServiceListAPIView(APIView):
 
 
 class ServiceDetailAPIView(APIView):
-    def get_service(self, pk):
-        return Service.objects.filter(service_id=pk).first()
+    def get_service(self, sid):
+        return Service.objects.filter(service_id=sid).first()
 
-    def get(self, request, pk):
-        service = self.get_service(pk)
+    def get(self, request, sid):
+        service = self.get_service(sid)
         serializer = ServiceSerializer(service)
 
         if not service:
@@ -36,8 +36,8 @@ class ServiceDetailAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, pk):
-        service = self.get_service(pk)
+    def put(self, request, sid):
+        service = self.get_service(sid)
         serializer = ServiceSerializer(service, data=request.data)
 
         if not service:
@@ -50,8 +50,8 @@ class ServiceDetailAPIView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk):
-        service = self.get_service(pk)
+    def delete(self, request, sid):
+        service = self.get_service(sid)
 
         if service:
             service.delete()
