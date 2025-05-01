@@ -42,7 +42,7 @@ class PlaceCreateSerializer(serializers.ModelSerializer):
         # Obtener los servicios relacionados a este lugar
         services = PlaceService.objects.filter(place=instance)
         service_data = [
-            {
+            {   "service_id":s.service_id,
                 "tipo": s.service.service_type,
                 "descripcion": s.service.service_description,
             }

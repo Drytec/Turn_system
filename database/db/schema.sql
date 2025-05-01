@@ -7,17 +7,16 @@ CREATE TABLE types (
 );
 
 -- Crear la tabla de Usuarios
-CREATE TABLE users (
+CREATE TABLE customuser (
         user_id SERIAL PRIMARY KEY,
         password VARCHAR(150) NOT NULL,
-        username VARCHAR(150) UNIQUE NOT NULL,
         email VARCHAR(150) UNIQUE NOT NULL,
         name VARCHAR(150) NOT NULL,
         age INTEGER NOT NULL,
-        conditions BOOLEAN DEFAULT FALSE,
+        condition BOOLEAN DEFAULT FALSE,
         last_name VARCHAR(150) NOT NULL,
         type_id INTEGER NOT NULL,
-        e_condition VARCHAR(150) DEFAULT 'Baja',
+        priority VARCHAR(150) DEFAULT 'L',
         is_staff BOOLEAN DEFAULT FALSE,
         is_active BOOLEAN DEFAULT TRUE,
         last_login TIMESTAMP NULL,
@@ -56,6 +55,6 @@ CREATE TABLE turn (
     place_id INTEGER NOT NULL ,
     service_id INTEGER NOT NULL ,
     FOREIGN KEY (service_id) REFERENCES service(service_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES customuser(user_id) ON DELETE CASCADE,
     FOREIGN KEY (place_id) REFERENCES place(place_id) ON DELETE CASCADE
 );

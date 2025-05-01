@@ -1,5 +1,5 @@
+from django.contrib.auth import authenticate
 
-from django.shortcuts import render
 from .serializers import PlaceSerializer, PlaceCreateSerializer
 from rest_framework import generics
 from rest_framework import status,viewsets
@@ -7,6 +7,7 @@ from .models import Place,PlaceService
 from ..servicio.models import Service
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
 
 
 class PlaceViewSet(viewsets.ModelViewSet):
@@ -24,11 +25,9 @@ class PlaceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(place, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-
-            # Actualizar servicios si se incluyen
             service_ids = request.data.get('service_ids')
             if service_ids is not None:
-                # Reemplazar completamente los servicios
+
                 PlaceService.objects.filter(place=place).delete()
                 for sid in service_ids:
                     try:
@@ -47,7 +46,7 @@ class PlaceViewSet(viewsets.ModelViewSet):
         #if place:
         #place.state = False
         #place.save()
-        #return Response({'message':'producto eliminado correctamente'})
+        #return Response({'message':'lugar eliminado correctamente'})
         place.delete()
         return Response({'message':'Lugar eliminado correctamente!'} , status=status.HTTP_200_OK )
 

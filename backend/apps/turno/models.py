@@ -1,13 +1,13 @@
 from tkinter import Place
 from django.db import models
 from ..puesto.models import Place
-from ..usuario.models import Users
+from ..usuario.models import CustomUser
 from ..servicio.models import Service
 # Create your models here.
 class Turn(models.Model):
     turn_id = models.AutoField(primary_key=True)
     turn_num = models.IntegerField()
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE,db_column='user_id')
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE,db_column='user_id')
     service_id = models.ForeignKey(Service, on_delete=models.CASCADE,db_column='service_id')
     place_id = models.ForeignKey(Place, on_delete=models.CASCADE,db_column='place_id')
 

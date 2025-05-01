@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.staticfiles',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'apps.usuario',
     'apps.servicio',
@@ -48,15 +50,27 @@ INSTALLED_APPS = [
     'drf_yasg',
 ]
 
-AUTH_USER_MODEL = 'usuario.Users'
+AUTH_USER_MODEL = 'usuario.CustomUser'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
 }
 
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+}
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -131,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 #AUTHENTICATION_BACKENDS = ['backend.EmailAuthBackend']
-TOKEN_EXPIRED_AFTER_SECONDS = 100
+TOKEN_EXPIRED_AFTER_SECONDS = 1000
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
