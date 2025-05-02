@@ -7,12 +7,12 @@ CREATE TABLE role (
 
 CREATE TABLE customuser (
         user_id SERIAL PRIMARY KEY,
-        password VARCHAR(50) NOT NULL,
-        email VARCHAR(50) UNIQUE NOT NULL,
-        name VARCHAR(50) NOT NULL,
+        password VARCHAR(150) NOT NULL,
+        email VARCHAR(150) UNIQUE NOT NULL,
+        name VARCHAR(150) NOT NULL,
         age INTEGER NOT NULL,
         condition BOOLEAN DEFAULT FALSE,
-        last_name VARCHAR(50) NOT NULL,
+        last_name VARCHAR(150) NOT NULL,
         role_id INTEGER NOT NULL,
         priority CHAR DEFAULT 'L',
         is_staff BOOLEAN DEFAULT FALSE,

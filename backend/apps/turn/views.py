@@ -70,7 +70,7 @@ class CloseTurnAPIView(APIView):
     def get_user(self, uid):
         return CustomUser.objects.filter(user_id=uid).first()
 
-    def put(self, request, uid, tid):
+    def get(self, request, uid, tid):
         turn = self.get_turn(tid)
         attended_by = self.get_user(uid)
 
@@ -101,13 +101,13 @@ class TurnAPIView(APIView):
         serializer = CreateTurnSerializer(data=request.data)
 
         if serializer.is_valid():
-            owner_id = serializer.validated_data.get('owner')
+            owner_id = serializer.validated_data.get('owner').user_id
             place_id = serializer.validated_data.get('place_id')
 
             if not owner_id or not place_id:
                 return Response({'message': 'Faltan datos obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            owner = CustomUser.objects.filter(user_id=owner_id).first(9)
+            owner = CustomUser.objects.filter(user_id=owner_id).first()
 
             if not owner:
                 return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
