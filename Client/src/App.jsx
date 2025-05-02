@@ -4,6 +4,7 @@ import Puestos from './pages/Puestos';
 import WelcomePage from './pages/WelcomePage';
 import Register from './pages/Register';
 import Turno from './pages/Turno';
+import Crear from './pages/Crear';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/puestos" element={<Puestos />}/>
         <Route path="/registro" element={<Register />}/>
         <Route path="/turno" element={<Turno />}/>
+        <Route path="/crear" element={<Crear />}/>
       </Routes>
     </BrowserRouter>
   );

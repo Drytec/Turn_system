@@ -13,43 +13,34 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    console.log('Email value:', email);
-    console.log('Password length:', password.length);
     try {
       const data = await getLogin({ email, password });
       console.log('Login exitoso:', data);
-      
-      // Adapt to the format returned by your backend
-      // Your backend returns { message: "inicio de sesion correcto" }
-      // We need to also store tokens from Simple JWT
-      
-      // If you modify your Login view to return tokens:
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        
-        // If user data is available in the response
-        if (data.user) {
-          localStorage.setItem('user_id', data.user.user_id);
-          alert('¡Bienvenido ' + data.user['Nombre del usuario'] + '!');
-        } else {
-          alert('¡Inicio de sesión exitoso!');
-        }
-        
-        navigate('/puestos');
-      } 
-      // For your current backend response that only returns a message
-      else if (data.message) {
-        alert('¡Inicio de sesión exitoso!');
-        // Since no token is returned, you may need to make another request
-        // to get user details or tokens, or modify your backend
-        navigate('/puestos');
+  
+      if (!data.token && !data.message) {
+        throw new Error('Respuesta inesperada del servidor');
       }
+  
+      localStorage.setItem('token', data.token || '');
+      
+      if (data.user) {
+        localStorage.setItem('role_id', data.user.role_id);
+        localStorage.setItem('user_id', data.user.user_id);
+        alert(`¡Bienvenido ${data.user['Nombre del usuario']}!`);
+        
+        const roleId = Number(data.user.role_id);
+        console.log(roleId);
+        navigate(roleId === 1 ? '/crear' : '/puestos', { replace: true });
+      } else {
+        navigate('/puestos', { replace: true });
+      }
+      
     } catch (error) {
-      console.error('Error al iniciar sesión:', error.response?.data || error.message);
+      console.error('Error al iniciar sesión:', error);
       setError('Credenciales incorrectas');
-      alert('Credenciales incorrectas');
+      alert(error.response?.data?.message || 'Error al iniciar sesión');
     }
-  };
+  }
 
   return (
     <div style={styles.wrapper}>

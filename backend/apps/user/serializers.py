@@ -36,6 +36,7 @@ class UserListSerializer(serializers.ModelSerializer):
         return {'Nombre del usuario': data['name'],
                 'Correo electronico:': data['email'],
                 'Prioridad': priority,
+                'role_id': data['role_id']
                 }
 
 
