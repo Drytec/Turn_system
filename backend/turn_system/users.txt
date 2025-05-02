@@ -2,11 +2,35 @@
     {
         "email": "juan.perez@example.com",
         "password": "password123",
-        "username": "juanperez",
-        "name": "Juan Pérez",
+        "name": "Juan",
+        "last_name":"Pérez",
         "age": 34,
-        "condition": false
-    },
+        "role_id": 3
+
+    }
+     {
+            "email": "diego.fernandez@example.com",
+            "password": "diego1234",
+            "name": "Diego",
+            "last_name": "Fernández"
+            "age": 59,
+            "condition": true
+     }
+         {
+             "email": "carlos.gomez@example.com",
+             "password": "12345678",
+             "name": "Carlos Gómez",
+             "age": 10,
+             "condition": false
+         },
+         {
+             "email": "laura.martinez@example.com",
+             "password": "mypassword",
+             "name": "Laura Martínez",
+             "age": 50,
+             "condition": true
+         },
+
     {
         "service_name": "Servicio Ejemplo",
         "service_desc": "ejemplo"
@@ -26,7 +50,6 @@
     {
         "email": "carlos.gomez@example.com",
         "password": "12345678",
-        "username": "carlosgomez",
         "name": "Carlos Gómez",
         "age": 10,
         "condition": false
@@ -34,17 +57,9 @@
     {
         "email": "laura.martinez@example.com",
         "password": "mypassword",
-        "username": "lauramartinez",
         "name": "Laura Martínez",
         "age": 50,
         "condition": true
     },
-    {
-        "email": "diego.fernandez@example.com",
-        "password": "diego1234",
-        "username": "diegofernandez",
-        "name": "Diego Fernández",
-        "age": 20,
-        "condition": false
-    }
+
 }

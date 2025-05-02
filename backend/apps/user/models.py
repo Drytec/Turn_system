@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db.models import NullBooleanField
 
 
 class Role(models.Model):
@@ -46,10 +47,10 @@ class CustomUser(AbstractBaseUser):
     password = models.CharField(max_length=150)
     name = models.CharField(max_length=150)
     age = models.IntegerField(default=0)
-    condition = models.BooleanField(default=False)
+    condition = models.BooleanField(default=None)
     role_id = models.ForeignKey(
         Role, on_delete=models.CASCADE, db_column='role_id')
-    priority = models.CharField(max_length=150, default='Baja')
+    priority = models.CharField(max_length=150, default=None)
     last_name = models.CharField(max_length=150)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
