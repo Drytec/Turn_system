@@ -50,12 +50,16 @@ class CustomUser(AbstractBaseUser):
     role_id = models.ForeignKey(
         Role, on_delete=models.CASCADE, db_column='role_id')
     priority = models.CharField(max_length=150, default='Baja')
-    last_name = models.CharField(max_length=1)
+    last_name = models.CharField(max_length=150)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
 
     objects = UserManager()
+
+    @property
+    def id(self):
+        return self.user_id
 
     class Meta:
         db_table = 'customuser'

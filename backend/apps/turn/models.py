@@ -22,7 +22,7 @@ class Turn(models.Model):
     def turn_attended_time(self):
         if self.date_closed and self.date_created:
             delta = self.date_closed - self.date_created
-            return round(delta.total_seconds() / 60, 2)
+            return delta.total_seconds() / 60
         return 0.0
 
     class Meta:
