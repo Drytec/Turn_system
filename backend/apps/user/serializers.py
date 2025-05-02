@@ -48,7 +48,7 @@ class UserCreationSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        validated_data['type_id'] = Role.objects.get(role_id=2)
+        validated_data['role_id'] = Role.objects.get(role_id=2)
         if validated_data['condition'] == True and (validated_data['age'] > 55 or validated_data['age'] < 12):
             validated_data['priority'] = "H"
 

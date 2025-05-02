@@ -1,6 +1,6 @@
 from ..place.models import Place
 from django.db import models
-# from ..user.models import User
+from ..user.models import CustomUser
 
 
 # Create your models here.
@@ -9,10 +9,10 @@ class Turn(models.Model):
     turn_name = models.CharField(max_length=5)
     turn_priority = models.CharField(max_length=1)
     active = models.BooleanField(default=True)
-    # attended_by = models.ForeignKey(
-    # User, on_delete=models.CASCADE, db_column='attended_by', null=True)
-    # owner = models.ForeignKey(
-    # User, on_delete=models.CASCADE, db_column='owner', null=True)
+    attended_by = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, db_column='attended_by', null=True, related_name='attended_turns')
+    owner = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, db_column='owner', null=True, related_name='owned_turns')
     place_id = models.ForeignKey(
         Place, on_delete=models.CASCADE, db_column='place_id')
     date_created = models.DateTimeField(auto_now_add=True)
