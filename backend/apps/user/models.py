@@ -41,7 +41,7 @@ class UserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser):
-    user_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=150)
     name = models.CharField(max_length=150)
@@ -56,10 +56,6 @@ class CustomUser(AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
 
     objects = UserManager()
-
-    @property
-    def id(self):
-        return self.user_id
 
     class Meta:
         db_table = 'customuser'

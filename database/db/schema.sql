@@ -6,7 +6,7 @@ CREATE TABLE role (
 );
 
 CREATE TABLE customuser (
-        user_id SERIAL PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         password VARCHAR(150) NOT NULL,
         email VARCHAR(150) UNIQUE NOT NULL,
         name VARCHAR(150) NOT NULL,
@@ -46,6 +46,6 @@ CREATE TABLE turn (
     date_created TIMESTAMP,
     date_closed TIMESTAMP NULL,
     FOREIGN KEY (place_id) REFERENCES place(place_id) ON DELETE CASCADE,
-    FOREIGN KEY (attended_by) REFERENCES customuser(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (owner) REFERENCES customuser(user_id) ON DELETE CASCADE
+    FOREIGN KEY (attended_by) REFERENCES customuser(id) ON DELETE CASCADE,
+    FOREIGN KEY (owner) REFERENCES customuser(id) ON DELETE CASCADE
 );
