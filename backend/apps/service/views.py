@@ -38,7 +38,8 @@ class ServiceDetailAPIView(APIView):
 
     def put(self, request, sid):
         service = self.get_service(sid)
-        serializer = ServiceSerializer(service, data=request.data)
+        serializer = ServiceSerializer(
+            service, data=request.data, partial=True)
 
         if not service:
             return Response({'message:' 'Servicio no encontrado.'}, status=status.HTTP_404_NOT_FOUND)

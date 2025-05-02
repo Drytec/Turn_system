@@ -39,7 +39,7 @@ class PlaceDetailAPIView(APIView):
 
     def put(self, request, pid):
         place = self.get_place(pid)
-        serializer = PlaceSerializer(place, data=request.data)
+        serializer = PlaceSerializer(place, data=request.data, partial=True)
 
         if place:
             if serializer.is_valid():

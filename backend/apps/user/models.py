@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
 class Role(models.Model):
@@ -41,7 +41,7 @@ class UserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser):
-    user_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=150)
     name = models.CharField(max_length=150)

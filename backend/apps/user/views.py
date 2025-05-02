@@ -62,7 +62,6 @@ class Login(TokenObtainPairView):
         try:
             serializer.is_valid(raise_exception=True)
         except Exception as e:
-            return Response({'error': 'No se pudo iniciar sesion'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'Message': 'Error al iniciar sesión.'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        data = serializer.validated_data
-        return Response(data, status=status.HTTP_200_OK)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)

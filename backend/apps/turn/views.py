@@ -1,3 +1,4 @@
+import math
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -8,6 +9,13 @@ from ..user.models import CustomUser
 from .models import Turn
 from ..place.models import Place
 from .serializers import TurnSerializer, CreateTurnSerializer
+
+
+def avg_attendacy_time(turns):
+    total_minutes = sum(t.turn_attended_time for t in turns)
+    expected_minutes = total_minutes / turns.count()
+
+    return expected_minutes
 
 
 class UserTurnsAPIView(APIView):
@@ -53,8 +61,7 @@ class UserActiveTurnAPIView(APIView):
         )
 
         if past_turns.exists():
-            total_minutes = sum(t.turn_attended_time for t in past_turns)
-            expected_minutes = round(total_minutes / past_turns.count(), 2)
+            expected_minutes = math.ceil(avg_attendacy_time)
         else:
             expected_minutes = 5.0
 
@@ -70,7 +77,7 @@ class CloseTurnAPIView(APIView):
     def get_user(self, uid):
         return CustomUser.objects.filter(user_id=uid).first()
 
-    def put(self, request, uid, tid):
+    def get(self, request, uid, tid):
         turn = self.get_turn(tid)
         attended_by = self.get_user(uid)
 
@@ -83,7 +90,7 @@ class CloseTurnAPIView(APIView):
         turn.active = False
         turn.attended_by = attended_by
         turn.date_closed = timezone.now()
-        turn.save
+        turn.save()
 
         serializer = TurnSerializer(turn)
 
@@ -101,25 +108,17 @@ class TurnAPIView(APIView):
         serializer = CreateTurnSerializer(data=request.data)
 
         if serializer.is_valid():
-            owner_id = serializer.validated_data.get('owner')
-            place_id = serializer.validated_data.get('place_id')
-
-            if not owner_id or not place_id:
-                return Response({'message': 'Faltan datos obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
-
-            owner = CustomUser.objects.filter(user_id=owner_id).first(9)
-
-            if not owner:
-                return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            owner = serializer.validated_data.get('owner')
+            place = serializer.validated_data.get('place_id')
 
             turn_count = Turn.objects.filter(
-                place_id=place_id).count()
+                place_id=place).count()
 
             turn_priority = owner.priority
 
             turn_number = (turn_count % 999) + 1
 
-            turn_name = f"{turn_priority}-{turn_number}"
+            turn_name = f"{turn_priority}-{turn_number:03d}"
 
             turn = serializer.save(
                 turn_priority=turn_priority, turn_name=turn_name)
@@ -141,8 +140,7 @@ class TurnStatsAPIView(APIView):
             past_turns = Turn.objects.filter(place_id=place, active=False)
 
             if past_turns.exists():
-                total_minutes = sum(t.turn_attended_time for t in past_turns)
-                avg_time = round(total_minutes / past_turns.count(), 2)
+                avg_time = round(avg_attendacy_time(past_turns), 2)
             else:
                 avg_time = "Desconocido"
 
