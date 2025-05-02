@@ -65,4 +65,4 @@ class Login(TokenObtainPairView):
             return Response({'error': 'No se pudo iniciar sesion'}, status=status.HTTP_401_UNAUTHORIZED)
 
         data = serializer.validated_data
-        return Response({'message': 'inicio de sesion correcto'}, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)

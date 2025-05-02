@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.place',
     'apps.turn',
-    'apps.role',
     'apps.service',
 ]
 

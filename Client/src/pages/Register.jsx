@@ -8,10 +8,9 @@ const Register = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    username: '',
     name: '',
     age: '',
-    conditions: false,
+    condition: false,
   });
 
   const handleChange = (e) => {
@@ -38,15 +37,6 @@ const Register = () => {
     <div style={styles.wrapper}>
       <h1 style={styles.heading}>Registro</h1>
       <form onSubmit={handleSubmit} style={styles.column}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Nombre de usuario"
-          value={formData.username}
-          onChange={handleChange}
-          style={styles.input}
-          required
-        />
         <input
           type="text"
           name="name"
