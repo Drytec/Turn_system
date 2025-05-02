@@ -29,10 +29,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'drf_yasg',
-    # 'apps.user',
+    'apps.user',
     'apps.place',
     'apps.turn',
-    # 'apps.role',
+    'apps.role',
     'apps.service',
 ]
 

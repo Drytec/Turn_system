@@ -26,5 +26,5 @@ urlpatterns = [
     path('place/', include('apps.place.urls')),
     path('turn/', include('apps.turn.urls')),
     path('service/', include('apps.service.urls')),
-    # path('user/', include('apps.user.urls'))
+    path('user/', include('apps.user.urls'))
 ]

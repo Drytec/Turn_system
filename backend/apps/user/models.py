@@ -1,6 +1,17 @@
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+
+class Role(models.Model):
+    role_id = models.AutoField(primary_key=True)
+    role_name = models.CharField(max_length=50)
+
+    class Meta:
+        db_table = 'role'
+        managed = False
+
+    def __str__(self):
+        return self.role_name
 
 
 class UserManager(BaseUserManager):
@@ -29,15 +40,16 @@ class UserManager(BaseUserManager):
         return self._create_user(username, email, name, last_name, password, is_staff=True, is_superuser=True, **extra_fields)
 
 
-class User(AbstractBaseUser):
+class CustomUser(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=150)
-    username = models.CharField(unique=True, max_length=150)
     name = models.CharField(max_length=150)
     age = models.IntegerField(default=0)
-    conditions = models.BooleanField(default=False)
-    e_condition = models.CharField(max_length=150, default='Baja')
+    condition = models.BooleanField(default=False)
+    role_id = models.ForeignKey(
+        Role, on_delete=models.CASCADE, db_column='role_id')
+    priority = models.CharField(max_length=150, default='Baja')
     last_name = models.CharField(max_length=150)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -46,7 +58,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     class Meta:
-        db_table = "user"
+        db_table = 'customuser'
         managed = False
 
     USERNAME_FIELD = 'email'
@@ -56,15 +68,3 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return f'{self.name} {self.last_name}'
-
-
-class Role(models.Model):
-    role_id = models.AutoField(primary_key=True)
-    role_name = models.CharField(max_length=50)
-
-    class Meta:
-        db_table = "role"
-        managed = False
-
-    def __str__(self):
-        return self.role_name

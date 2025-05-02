@@ -4,15 +4,15 @@ from rest_framework import status
 from django.db.models import Count
 from django.utils import timezone
 from datetime import timedelta
-# from ..user.models import User
+from ..user.models import CustomUser
 from .models import Turn
 from ..place.models import Place
 from .serializers import TurnSerializer, CreateTurnSerializer
 
 
-"""class UserTurnsAPIView(APIView):
+class UserTurnsAPIView(APIView):
     def get_user(self, uid):
-        return User.objects.filter(user_id=uid).first()
+        return CustomUser.objects.filter(user_id=uid).first()
 
     def get(self, request, uid):
         owner = self.get_user(uid)
@@ -26,12 +26,12 @@ from .serializers import TurnSerializer, CreateTurnSerializer
         if turns.exists():
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response({'message': 'No se encontraron turnos.'}, status=status.HTTP_200_OK)"""
+        return Response({'message': 'No se encontraron turnos.'}, status=status.HTTP_200_OK)
 
 
-"""class UserActiveTurnAPIView(APIView):
+class UserActiveTurnAPIView(APIView):
     def get_user(self, uid):
-        return User.objects.filter(user_id=uid).first()
+        return CustomUser.objects.filter(user_id=uid).first()
 
     def get(self, request, uid):
         user = self.get_user(uid)
@@ -60,28 +60,28 @@ from .serializers import TurnSerializer, CreateTurnSerializer
 
         serializer = TurnSerializer(turn)
 
-        return Response({**serializer.data, 'expected_attendacy_time': expected_minutes}, status=status.HTTP_200_OK)"""
+        return Response({**serializer.data, 'expected_attendacy_time': expected_minutes}, status=status.HTTP_200_OK)
 
 
 class CloseTurnAPIView(APIView):
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
-    # def get_user(self, uid):
-        # return User.objects.filter(user_id=uid).first()
+    def get_user(self, uid):
+        return CustomUser.objects.filter(user_id=uid).first()
 
     def put(self, request, uid, tid):
         turn = self.get_turn(tid)
-        # attended_by = self.get_user(uid)
+        attended_by = self.get_user(uid)
 
         if not turn:
             return Response({'message': 'Turno no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # if not attended_by:
-            # return Response({'message': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+        if not attended_by:
+            return Response({'message': 'Usuario no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
         turn.active = False
-        # turn.attended_by = attended_by
+        turn.attended_by = attended_by
         turn.date_closed = timezone.now()
         turn.save
 
@@ -101,34 +101,28 @@ class TurnAPIView(APIView):
         serializer = CreateTurnSerializer(data=request.data)
 
         if serializer.is_valid():
-            # owner_id = serializer.validated_data.get('owner')
+            owner_id = serializer.validated_data.get('owner')
             place_id = serializer.validated_data.get('place_id')
 
-            # if not owner_id or not place_id:
-            # return Response({'message': 'Faltan datos obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
-
-            if not place_id:
+            if not owner_id or not place_id:
                 return Response({'message': 'Faltan datos obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # owner = User.objects.filter(user_id=owner_id).first(9)
+            owner = CustomUser.objects.filter(user_id=owner_id).first(9)
 
-            # if not owner:
-                # return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            if not owner:
+                return Response({'message': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
             turn_count = Turn.objects.filter(
                 place_id=place_id).count()
 
-            # turn_priority = owner.priority
+            turn_priority = owner.priority
 
             turn_number = (turn_count % 999) + 1
 
-            # turn_name = f"{turn_priority}-{turn_number}"
+            turn_name = f"{turn_priority}-{turn_number}"
 
-            turn_name = f"A-{turn_number:03d}"
-
-            # turn = serializer.save(turn_priority=turn_priority, turn_name=turn_name)
-
-            turn = serializer.save(turn_name=turn_name)
+            turn = serializer.save(
+                turn_priority=turn_priority, turn_name=turn_name)
 
             response_serializer = TurnSerializer(turn)
 
@@ -172,18 +166,18 @@ class NextTurnAPIView(APIView):
     def get_place(self, pid):
         return Place.objects.filter(place_id=pid).first()
 
-    # def get_user(self, uid):
-        # return User.objects.filter(user_id=uid).first()
+    def get_user(self, uid):
+        return CustomUser.objects.filter(user_id=uid).first()
 
     def get(self, request, uid, pid):
         place = self.get_place(pid)
-        # attended_by = self.get_user(uid)
+        attended_by = self.get_user(uid)
 
         if not place:
             return Response({'message:' 'Punto no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # if not attended_by:
-            # return Response({'message:' 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+        if not attended_by:
+            return Response({'message:' 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
         for priority in ['H', 'M', 'L']:
             turn = Turn.objects.filter(
@@ -194,7 +188,7 @@ class NextTurnAPIView(APIView):
 
             if turn:
                 turn.active = False
-                # turn.attended_by = attended_by
+                turn.attended_by = attended_by
                 turn.date_closed = timezone.now()
                 turn.save()
 

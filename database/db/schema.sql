@@ -2,24 +2,24 @@
 
 CREATE TABLE role (
     role_id SERIAL PRIMARY KEY,
-    role_name VARCHAR(50) NOT NULL
+    role_name VARCHAR(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE "user" (
-    user_id SERIAL PRIMARY KEY,
-    password TEXT NOT NULL,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(50) UNIQUE NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    age INTEGER NOT NULL,
-    condition BOOLEAN DEFAULT FALSE,
-    priority CHAR,
-    role_id INTEGER NOT NULL,
-    is_staff BOOLEAN DEFAULT FALSE,
-    is_active BOOLEAN DEFAULT TRUE,
-    last_login TIMESTAMP NULL,
-    is_superuser BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (role_id) REFERENCES role(role_id) ON DELETE CASCADE
+CREATE TABLE customuser (
+        user_id SERIAL PRIMARY KEY,
+        password VARCHAR(50) NOT NULL,
+        email VARCHAR(50) UNIQUE NOT NULL,
+        name VARCHAR(50) NOT NULL,
+        age INTEGER NOT NULL,
+        condition BOOLEAN DEFAULT FALSE,
+        last_name VARCHAR(50) NOT NULL,
+        role_id INTEGER NOT NULL,
+        priority CHAR DEFAULT 'L',
+        is_staff BOOLEAN DEFAULT FALSE,
+        is_active BOOLEAN DEFAULT TRUE,
+        last_login TIMESTAMP NULL,
+        is_superuser BOOLEAN DEFAULT FALSE,
+        FOREIGN KEY (role_id) REFERENCES role(role_id) ON DELETE CASCADE
 );
 
 CREATE TABLE service (
@@ -41,12 +41,11 @@ CREATE TABLE turn (
     turn_priority CHAR NOT NULL,
     active BOOLEAN DEFAULT TRUE,
     attended_by INTEGER NULL,
-    --owner INTEGER NOT NULL,
-    owner INTEGER NULL,
+    owner INTEGER NOT NULL,
     place_id INTEGER NOT NULL,
     date_created TIMESTAMP,
     date_closed TIMESTAMP NULL,
     FOREIGN KEY (place_id) REFERENCES place(place_id) ON DELETE CASCADE,
-    FOREIGN KEY (attended_by) REFERENCES "user"(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (owner) REFERENCES "user"(user_id) ON DELETE CASCADE
+    FOREIGN KEY (attended_by) REFERENCES customuser(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (owner) REFERENCES customuser(user_id) ON DELETE CASCADE
 );
