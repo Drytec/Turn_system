@@ -8,6 +8,14 @@
         "condition": false
     },
     {
+        "service_name": "Servicio Ejemplo",
+        "service_desc": "ejemplo"
+    },
+    {
+        "service_id": "4",
+        "place_name": "Punto Ejemplo"
+    },
+    {
         "email": "maria.lopez@example.com",
         "password": "securepass",
         "username": "marialopez",
