@@ -46,7 +46,7 @@ class CustomUser(AbstractBaseUser):
     password = models.CharField(max_length=150)
     name = models.CharField(max_length=150)
     age = models.IntegerField(default=0)
-    condition = models.BooleanField(default=False)
+    condition = models.BooleanField(default=False, null=True)
     role_id = models.ForeignKey(
         Role, on_delete=models.CASCADE, db_column='role_id')
     priority = models.CharField(max_length=150, default='Baja')
@@ -58,7 +58,7 @@ class CustomUser(AbstractBaseUser):
     objects = UserManager()
 
     class Meta:
-        db_table = 'customuser'
+        db_table = 'custom_user'
         managed = False
 
     USERNAME_FIELD = 'email'

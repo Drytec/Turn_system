@@ -5,13 +5,13 @@ CREATE TABLE role (
     role_name VARCHAR(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE customuser (
+CREATE TABLE custom_user (
     id SERIAL PRIMARY KEY,
     password VARCHAR(150) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
     name VARCHAR(150) NOT NULL,
     age INTEGER NOT NULL,
-    condition BOOLEAN DEFAULT FALSE,
+    condition BOOLEAN NULL DEFAULT FALSE,
     last_name VARCHAR(150) NOT NULL,
     role_id INTEGER NOT NULL,
     priority CHAR DEFAULT 'L',
@@ -35,11 +35,20 @@ CREATE TABLE place (
     FOREIGN KEY (service_id) REFERENCES service(service_id) ON DELETE CASCADE
 );
 
+CREATE TABLE place_custom_user (
+    place_custom_user_id = SERIAL PRIMARY KEY,
+    place_id INT NOT NULL,
+    custom_user_id INT NOT NULL,
+    FOREIGN KEY (place_id) REFERENCES place(place_id) ON DELETE CASCADE,
+    FOREIGN KEY (custom_user_id) REFERENCES custom_user(custom_user_id) ON DELETE CASCADE
+)
+
 CREATE TABLE turn (
     turn_id SERIAL PRIMARY KEY,
     turn_name VARCHAR(5) NOT NULL,
     turn_priority CHAR NOT NULL,
     active BOOLEAN DEFAULT TRUE,
+    cancaled BOOLEAN DEFAULT FALSE,
     attended_by INTEGER NULL,
     owner INTEGER NOT NULL,
     place_id INTEGER NOT NULL,

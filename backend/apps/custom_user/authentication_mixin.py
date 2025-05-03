@@ -1,6 +1,4 @@
-from rest_framework import status, authentication, exceptions
-from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
+from rest_framework import authentication, exceptions
 from rest_framework.authentication import get_authorization_header
 
 from .authenticate import ExpiringTokenAuthentication

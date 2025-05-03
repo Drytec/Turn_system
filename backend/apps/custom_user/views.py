@@ -10,6 +10,10 @@ from .models import CustomUser
 from .serializers import CustomTokenObtainPairSerializer
 
 
+def get_user(self, uid):
+    return CustomUser.objects.filter(id=uid).first()
+
+
 @api_view(['GET', 'POST', 'DELETE'])
 def user_api_view(request):
     if request.method == 'GET':
