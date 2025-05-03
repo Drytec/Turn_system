@@ -15,32 +15,55 @@ const Login = () => {
     setError('');
     try {
       const data = await getLogin({ email, password });
-      console.log('Login exitoso:', data);
+      console.log('Respuesta completa del login:', data); // Depuración detallada
   
-      if (!data.token && !data.message) {
-        throw new Error('Respuesta inesperada del servidor');
+      // Verificación exhaustiva del token
+      if (!data?.access) {
+        console.error('Estructura inesperada:', data);
+        throw new Error('El servidor no devolvió un token válido');
       }
   
-      localStorage.setItem('token', data.token || '');
+      // Almacenamiento seguro
+      localStorage.setItem('access_token', data.access);
       
+      // Guardar refresh token si existe
+      if (data.refresh) {
+        localStorage.setItem('refresh_token', data.refresh);
+      }
+  
+      console.log('Token almacenado:', localStorage.getItem('access_token')); // Verificación
+  
+      // Manejo de datos de usuario
       if (data.user) {
         localStorage.setItem('role_id', data.user.role_id);
-        localStorage.setItem('user_id', data.user.user_id);
-        alert(`¡Bienvenido ${data.user['Nombre del usuario']}!`);
+        localStorage.setItem('user_id', data.user.id); // Cambiado de user_id a id para consistencia
+        localStorage.setItem('user_name', data.user.name);
+        
+        alert(`¡Bienvenido ${data.user.name}!`);
         
         const roleId = Number(data.user.role_id);
-        console.log(roleId);
-        navigate(roleId === 1 ? '/crear' : '/puestos', { replace: true });
+        console.log('Role ID:', roleId);
+        
+        // Navegación basada en roles
+        navigate(roleId === 1 ? '/crear' : '/puestos', { 
+          replace: true,
+          state: { freshLogin: true }
+        });
       } else {
         navigate('/puestos', { replace: true });
       }
       
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      setError('Credenciales incorrectas');
-      alert(error.response?.data?.message || 'Error al iniciar sesión');
+      console.error('Error completo:', {
+        message: error.message,
+        response: error.response?.data,
+        stack: error.stack
+      });
+      
+      setError(error.response?.data?.detail || 'Error al iniciar sesión');
+      alert(error.response?.data?.detail || 'Credenciales incorrectas');
     }
-  }
+  };
 
   return (
     <div style={styles.wrapper}>

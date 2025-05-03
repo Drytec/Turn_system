@@ -15,12 +15,11 @@ class Role(models.Model):
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, username, email, name, last_name, password, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, email, name, last_name, password, is_staff, is_superuser, **extra_fields):
         if not email:
             raise ValueError("El usuario debe tener un correo electrónico")
         email = self.normalize_email(email)
         user = self.model(
-            username=username,
             email=email,
             name=name,
             last_name=last_name,
@@ -37,7 +36,18 @@ class UserManager(BaseUserManager):
         return self._create_user(username, email, name, last_name, password, is_staff=False, is_superuser=False, **extra_fields)
 
     def create_superuser(self, email, name, last_name, password=None, **extra_fields):
-        return self._create_user(email, name, last_name, password, is_staff=True, is_superuser=True, **extra_fields)
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('priority', 'H')  # Prioridad alta para superusers
+        extra_fields.setdefault('role_id', Role.objects.get(role_id=1))  # Asume que 1 es el ID para rol admin
+        
+        return self._create_user(
+            email=email,
+            name=name,
+            last_name=last_name,
+            password=password,
+            **extra_fields
+        )
 
 
 class CustomUser(AbstractBaseUser):
@@ -62,6 +72,7 @@ class CustomUser(AbstractBaseUser):
         managed = False
 
     USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name', 'last_name']
 
     def get_full_name(self):
         return f'{self.name} {self.last_name}'
