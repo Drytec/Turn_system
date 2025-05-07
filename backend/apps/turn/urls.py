@@ -11,6 +11,6 @@ urlpatterns = [
          CancelTurnAPIView.as_view(), name='cancel_turn'),
     path('user_active_turn/<int:uid>',
          UserActiveTurnAPIView.as_view(), name='user_active_turn'),
-    path('next_turn/<int:uid>/<int:pid>/',
+    path('next_turn/<int:uid>/<int:pid>',
          NextTurnAPIView.as_view(), name='next_turn')
 ]

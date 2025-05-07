@@ -1,7 +1,7 @@
-from ..apps.place.models import Place
-from ..apps.custom_user.models import CustomUser
-from ..apps.turn.models import Turn
-from ..apps.turn.views import avg_attendacy_time
+from apps.place.models import Place
+from apps.custom_user.models import CustomUser
+from apps.turn.models import Turn
+from apps.turn.views import avg_attendacy_time
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -20,18 +20,16 @@ class StatsAPIView(APIView):
         disability_attended = 0
         older_adults_attended = 0
 
-        normal_attended = CustomUser.objects.filter(
-            priority='L', owned_turns__attended=True).distinct.count()
-        total_attended_users_count = CustomUser.objects.filter(
-            owned_turns__attended=True).distinct().count()
+        normal_attended = CustomUser.objects.filter(priority='L', owned_turns__active=False, owned_turns__canceled=False).distinct().count()
+        total_attended_users_count = CustomUser.objects.filter(owned_turns__active=False, owned_turns__canceled=False).distinct().count()
 
         for place in places:
             place_turns = Turn.objects.filter(place_id=place)
-            non_canceled_attended_turns = place_turns.objects.filter(
+            non_canceled_attended_turns = place_turns.filter(
                 active=False, canceled=False)
-            canceled_turns = place_turns.objects.filter(
+            canceled_turns = place_turns.filter(
                 active=False, canceled=True)
-            active_turns = place_turns.objects.filter(
+            active_turns = place_turns.filter(
                 place_id=place, active=True)
 
             older_adults_attended += non_canceled_attended_turns.filter(
@@ -78,6 +76,7 @@ class StatsAPIView(APIView):
 
         data.append({
             'attended_users_demographic_distribution': {
+                'total_attended': total_attended_users_count,
                 'older_adults_attended': older_adults_attended,
                 'older_adults_percentage': older_adults_attended_percentage,
                 'discapacity_attended': disability_attended,
@@ -85,7 +84,7 @@ class StatsAPIView(APIView):
                 'normal_attended': normal_attended,
                 'normal_attended_percentage': normal_attended_percentage
             },
-            'users_priority_distribution': {
+            'attended_users_priority_distribution': {
                 'h_priority_attended': h_priority_attended,
                 'm_priority_attended': m_priority_attended,
                 'l_priority_attended': l_priority_attended

@@ -11,10 +11,10 @@ CREATE TABLE custom_user (
     email VARCHAR(150) UNIQUE NOT NULL,
     name VARCHAR(150) NOT NULL,
     age INTEGER NOT NULL,
-    condition BOOLEAN NULL DEFAULT FALSE,
+    condition BOOLEAN NULL DEFAULT NULL,
     last_name VARCHAR(150) NOT NULL,
     role_id INTEGER NOT NULL,
-    priority CHAR DEFAULT 'L',
+    priority CHAR DEFAULT NULL,
     is_staff BOOLEAN DEFAULT FALSE,
     is_active BOOLEAN DEFAULT TRUE,
     last_login TIMESTAMP NULL,
@@ -36,25 +36,25 @@ CREATE TABLE place (
 );
 
 CREATE TABLE place_custom_user (
-    place_custom_user_id = SERIAL PRIMARY KEY,
+    place_custom_user_id SERIAL PRIMARY KEY,
     place_id INT NOT NULL,
     custom_user_id INT NOT NULL,
     FOREIGN KEY (place_id) REFERENCES place(place_id) ON DELETE CASCADE,
-    FOREIGN KEY (custom_user_id) REFERENCES custom_user(custom_user_id) ON DELETE CASCADE
-)
+    FOREIGN KEY (custom_user_id) REFERENCES custom_user(id) ON DELETE CASCADE
+);
 
 CREATE TABLE turn (
     turn_id SERIAL PRIMARY KEY,
     turn_name VARCHAR(5) NOT NULL,
     turn_priority CHAR NOT NULL,
     active BOOLEAN DEFAULT TRUE,
-    cancaled BOOLEAN DEFAULT FALSE,
+    canceled BOOLEAN DEFAULT FALSE,
     attended_by INTEGER NULL,
     owner INTEGER NOT NULL,
     place_id INTEGER NOT NULL,
     date_created TIMESTAMP,
     date_closed TIMESTAMP NULL,
     FOREIGN KEY (place_id) REFERENCES place(place_id) ON DELETE CASCADE,
-    FOREIGN KEY (attended_by) REFERENCES customuser(id) ON DELETE CASCADE,
-    FOREIGN KEY (owner) REFERENCES customuser(id) ON DELETE CASCADE
+    FOREIGN KEY (attended_by) REFERENCES custom_user(id) ON DELETE CASCADE,
+    FOREIGN KEY (owner) REFERENCES custom_user(id) ON DELETE CASCADE
 );

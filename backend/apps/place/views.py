@@ -82,7 +82,7 @@ class UserPlacesDetailAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class AddUserToPlace(APIView):
+class AddUserToPlaceAPIView(APIView):
     def get_place(self, pid):
         return CustomUser.objects.filter(place_id=pid).first()
     

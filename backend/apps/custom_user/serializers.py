@@ -60,3 +60,27 @@ class UserCreationSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+
+class UserEmployeeCreationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'password', 'name', 'last_name','age', 'condition','role_id']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+    def create(self, validated_data):
+        user = CustomUser.objects.create(**validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+    
+class UserEmployeeListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return {'Nombre del usuario': data['name'],
+                'Correo electronico:': data['email'],}

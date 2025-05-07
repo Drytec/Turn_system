@@ -141,9 +141,9 @@ class TurnAPIView(APIView):
             owner = serializer.validated_data.get('owner')
             place = serializer.validated_data.get('place_id')
 
-            owner_turns = Turn.objects.filter(user_id=owner, active=True)
+            owner_turns = Turn.objects.filter(owner=owner, active=True)
 
-            if owner_turns.count() != 1:
+            if owner_turns.count() != 0:
                 return Response({'message': 'Ya tiene un turno activo.'}, status=status.HTTP_404_NOT_FOUND)
 
             turn_count = Turn.objects.filter(

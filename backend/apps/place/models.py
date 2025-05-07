@@ -1,6 +1,5 @@
 from django.db import models
 from ..service.models import Service
-from ..place.models import Place
 from ..custom_user.models import CustomUser
 
 
