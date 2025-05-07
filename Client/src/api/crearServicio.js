@@ -9,16 +9,16 @@ export const createService = async ({ service_name, service_desc }) => {
     console.log('Attempting to create service with:', { service_name, service_desc });
     console.log('Request URL:', serviceApi.defaults.baseURL + '/api/services/');
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) {
       throw new Error('No authentication token found');
     }
-
+    console.log('Token:', token);
     const response = await serviceApi.post(
       'service/',
       {
-        service_name,  // Campo obligatorio (unique, max_length=50)
-        service_desc,  // Campo obligatorio (TextField)
+        service_name,  
+        service_desc, 
       },
       {
         headers: {
@@ -36,6 +36,6 @@ export const createService = async ({ service_name, service_desc }) => {
       error: error.response?.data || error.message,
       status: error.response?.status,
     });
-    throw error; // Propaga el error para manejarlo en el componente
+    throw error; 
   }
 };

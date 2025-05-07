@@ -9,6 +9,7 @@ const Register = () => {
     email: '',
     password: '',
     name: '',
+    last_name: '',
     age: '',
     condition: false,
   });
@@ -40,8 +41,17 @@ const Register = () => {
         <input
           type="text"
           name="name"
-          placeholder="Nombre completo"
+          placeholder="Nombre"
           value={formData.name}
+          onChange={handleChange}
+          style={styles.input}
+          required
+        />
+        <input
+          type="text"
+          name="last_name"
+          placeholder="Apellido"
+          value={formData.last_name}
           onChange={handleChange}
           style={styles.input}
           required

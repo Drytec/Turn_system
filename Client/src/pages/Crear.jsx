@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPlace } from '../api/crearPuestos';
 import { createService } from '../api/crearServicio';
+import { fetchPuestos } from '../api/puestos'; // Traemos la función para obtener los puestos
 
 const Crear = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentForm, setCurrentForm] = useState(null);
   const [formData, setFormData] = useState({
     place_name: '',
-    service_id: '',
     service_name: '',
     service_desc: ''
   });
+
+  const [puestos, setPuestos] = useState([]); // Nuevo estado para los puestos
+
+  useEffect(() => {
+    const obtenerPuestos = async () => {
+      try {
+        const data = await fetchPuestos(); // Llama a la función que obtiene los puestos
+        setPuestos(data); // Guarda los puestos en el estado
+      } catch (error) {
+        console.error('Error al obtener los puestos:', error);
+      }
+    };
+    obtenerPuestos();
+  }, []); // Solo se ejecuta una vez al montar el componente
 
   const handleButtonClick = (formType) => {
     setCurrentForm(formType);
@@ -26,24 +40,31 @@ const Crear = () => {
     e.preventDefault();
     try {
       if (currentForm === 'place') {
-        await crearPuesto({
+        // 1. Crear el servicio
+        const newService = await createService({
+          service_name: formData.service_name,
+          service_desc: formData.service_desc
+        });
+
+        // 2. Luego crear el puesto con el ID del servicio recién creado
+        await createPlace({
           place_name: formData.place_name,
-          service_id: Number(formData.service_id)
+          service_id: newService.service_id  // o newService.service_id según lo que retorne tu API
         });
       } else {
-        await crearServicio({
+        await createService({
           service_name: formData.service_name,
           service_desc: formData.service_desc
         });
       }
+
       setShowModal(false);
       setFormData({
         place_name: '',
-        service_id: '',
         service_name: '',
         service_desc: ''
       });
-      alert(`${currentForm === 'place' ? 'Puesto' : 'Servicio'} creado exitosamente!`);
+      alert(`${currentForm === 'place' ? 'Puesto y servicio' : 'Servicio'} creados exitosamente!`);
     } catch (error) {
       alert(`Error al crear: ${error.response?.data?.message || error.message}`);
     }
@@ -80,60 +101,45 @@ const Crear = () => {
             </button>
             
             <h2 style={{...styles.heading, fontSize: '1.8rem', marginBottom: '1.5rem'}}>
-              {currentForm === 'place' ? 'Nuevo Puesto' : 'Nuevo Servicio'}
+              {currentForm === 'place' ? 'Nuevo Puesto + Servicio' : 'Nuevo Servicio'}
             </h2>
             
             <form onSubmit={handleSubmit}>
-              {currentForm === 'place' ? (
-                <>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Nombre del Puesto:</label>
-                    <input
-                      type="text"
-                      name="place_name"
-                      value={formData.place_name}
-                      onChange={handleInputChange}
-                      style={styles.input}
-                      required
-                    />
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>ID de Servicio:</label>
-                    <input
-                      type="number"
-                      name="service_id"
-                      value={formData.service_id}
-                      onChange={handleInputChange}
-                      style={styles.input}
-                      required
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Nombre del Servicio:</label>
-                    <input
-                      type="text"
-                      name="service_name"
-                      value={formData.service_name}
-                      onChange={handleInputChange}
-                      style={styles.input}
-                      required
-                    />
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Descripción:</label>
-                    <textarea
-                      name="service_desc"
-                      value={formData.service_desc}
-                      onChange={handleInputChange}
-                      style={styles.textarea}
-                      required
-                    />
-                  </div>
-                </>
+              {currentForm === 'place' && (
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Nombre del Puesto:</label>
+                  <input
+                    type="text"
+                    name="place_name"
+                    value={formData.place_name}
+                    onChange={handleInputChange}
+                    style={styles.input}
+                    required
+                  />
+                </div>
               )}
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Nombre del Servicio:</label>
+                <input
+                  type="text"
+                  name="service_name"
+                  value={formData.service_name}
+                  onChange={handleInputChange}
+                  style={styles.input}
+                  required
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Descripción:</label>
+                <textarea
+                  name="service_desc"
+                  value={formData.service_desc}
+                  onChange={handleInputChange}
+                  style={styles.textarea}
+                  required
+                />
+              </div>
+
               <button type="submit" style={styles.submitButton}>
                 Crear
               </button>
@@ -141,6 +147,19 @@ const Crear = () => {
           </div>
         </div>
       )}
+
+      <div style={styles.puestosContainer}>
+        <h2 style={styles.puestosHeading}>Lista de Puestos</h2>
+        <ul style={styles.puestosList}>
+          {puestos.map((puesto) => (
+            <li key={puesto.place_id} style={styles.puestoItem}>
+              <strong>Puesto:</strong> {puesto.place_name}<br />
+              <strong>Servicio:</strong> {puesto.service?.service_name}<br />
+              <strong>Descripción:</strong> {puesto.service?.service_desc}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
@@ -180,9 +199,6 @@ const styles = {
     fontSize: '1rem',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
-    '&:hover': {
-      backgroundColor: '#1a252f',
-    }
   },
   modalOverlay: {
     position: 'fixed',
@@ -252,8 +268,29 @@ const styles = {
     borderRadius: '8px',
     cursor: 'pointer',
     transition: 'background-color 0.3s ease',
-    '&:hover': {
-      backgroundColor: '#219653',
-    }
-  }
+  },
+  puestosContainer: {
+    marginTop: '3rem', // Da espacio debajo de los botones
+    padding: '2rem',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '12px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+  },
+  puestosHeading: {
+    fontSize: '1.6rem',
+    marginBottom: '1.5rem',
+    color: '#2c3e50',
+  },
+  puestosList: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+  },
+  puestoItem: {
+    padding: '1rem',
+    marginBottom: '1rem',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+  },
 };

@@ -9,10 +9,14 @@ export const createPlace = async ({ place_name, service_id }) => {
     console.log('Attempting to create place with:', { place_name, service_id });
     console.log('Request URL:', placeApi.defaults.baseURL + '/api/places/');
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (!token) {
       throw new Error('No authentication token found');
     }
+    console.log('Datos que se enviarán:', {
+      place_name,
+      service_id
+    });
 
     const response = await placeApi.post(
       'place/',
@@ -36,6 +40,6 @@ export const createPlace = async ({ place_name, service_id }) => {
       error: error.response?.data || error.message,
       status: error.response?.status,
     });
-    throw error; // Propaga el error para manejarlo en el componente
+    throw error; 
   }
 };
