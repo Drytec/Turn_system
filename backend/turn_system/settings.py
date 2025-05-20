@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.staticfiles',
-    'coreapi',
+   # 'coreapi',
     'corsheaders',
     'drf_yasg',
     'apps.user',
@@ -94,17 +94,24 @@ WSGI_APPLICATION = 'turn_system.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'turn_system',
+#         'USER': 'postgres',
+#         'PASSWORD': 'aP4sw0rd',
+#         'HOST': 'localhost',
+#         'PORT': '5433',
+#         'OPTIONS': {
+#             'options': '-c client_encoding=UTF8',
+#         },
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'turn_system',
-        'USER': 'postgres',
-        'PASSWORD': 'aP4sw0rd',
-        'HOST': 'localhost',
-        'PORT': '5433',
-        'OPTIONS': {
-            'options': '-c client_encoding=UTF8',
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 #Cors authorization
