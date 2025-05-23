@@ -99,14 +99,17 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'turn_system',
         'USER': 'postgres',
-        'PASSWORD': 'aP4sw0rd',
+       'PASSWORD': 'aP4sw0rd',
         'HOST': 'localhost',
         'PORT': '5433',
         'OPTIONS': {
-            'options': '-c client_encoding=UTF8',
-        },
+           'options': '-c client_encoding=UTF8',
+       },
     }
 }
+
+
+
 #Cors authorization
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",

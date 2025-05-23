@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models import NullBooleanField
 
 
@@ -80,3 +80,16 @@ class CustomUser(AbstractBaseUser):
 
     def __str__(self):
         return f'{self.name} {self.last_name}'
+
+    def has_module_perms(self, app_label):
+    
+        if self.is_superuser:
+            return True
+ 
+        return self.get_all_permissions(app_label=app_label)  
+    def has_perm(self, perm, obj=None):
+    
+        if self.is_superuser:
+            return True
+     
+        return self.user_permissions.filter(codename=perm).exists()
