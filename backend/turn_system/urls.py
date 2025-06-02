@@ -3,6 +3,7 @@ from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from .views import StatsAPIView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -22,9 +23,9 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc',
          cache_timeout=0), name='schema-redoc'),
     path('admin/', admin.site.urls),
-    # path('', include('apps.user.urls')),
     path('place/', include('apps.place.urls')),
     path('turn/', include('apps.turn.urls')),
     path('service/', include('apps.service.urls')),
-    path('user/', include('apps.user.urls'))
+    path('user/', include('apps.custom_user.urls')),
+    path('stats/', StatsAPIView.as_view(), name='stats')
 ]

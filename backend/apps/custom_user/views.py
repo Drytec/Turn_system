@@ -5,16 +5,34 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import UserSerializer, UserListSerializer, UserCreationSerializer, UserWorkerCreationSerializer, \
-    UserWorkerListSerializer
+from .serializers import UserSerializer, UserListSerializer, UserCreationSerializer, UserEmployeeListSerializer, UserEmployeeCreationSerializer
 from .models import CustomUser
 from .serializers import CustomTokenObtainPairSerializer
+
+
+def get_user(self, uid):
+    return CustomUser.objects.filter(id=uid).first()
+
+
+@api_view(['GET', 'POST', 'DELETE'])
+def user_employee_api_view(request):
+    if request.method == 'GET':
+        users = CustomUser.objects.filter(role_id=3)
+        # turn = turn.objects.filter(user_id=request.user.id)
+        serializer = UserEmployeeListSerializer(users, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = UserEmployeeCreationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'POST', 'DELETE'])
 def user_api_view(request):
     if request.method == 'GET':
-        users = CustomUser.objects.filter(role_id=2)
+        users = CustomUser.objects.all()
        # turn = turn.objects.filter(user_id=request.user.id)
         serializer = UserListSerializer(users, many=True)
         return Response(serializer.data)
@@ -25,24 +43,11 @@ def user_api_view(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'POST', 'DELETE'])
-def user_worker_api_view(request):
-    if request.method == 'GET':
-        users = CustomUser.objects.filter(role_id=3)
-        # turn = turn.objects.filter(user_id=request.user.id)
-        serializer = UserWorkerListSerializer(users, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = UserWorkerCreationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def user_detail(request, uid):
     if request.method == 'GET':
-        user = CustomUser.objects.filter(user_id=uid).first()
+        user = CustomUser.objects.filter(id=uid).first()
         serializer = UserSerializer(user)
         if user is None:
             return Response({"error": "Usuario no encontrado"}, status=404)

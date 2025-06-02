@@ -1,6 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.db.models import NullBooleanField
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 
 class Role(models.Model):
@@ -9,18 +8,19 @@ class Role(models.Model):
 
     class Meta:
         db_table = 'role'
-        managed = False
+        managed = True  
 
     def __str__(self):
         return self.role_name
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, name, last_name, password, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, username, email, name, last_name, password, is_staff, is_superuser, **extra_fields):
         if not email:
             raise ValueError("El usuario debe tener un correo electrónico")
         email = self.normalize_email(email)
         user = self.model(
+            username=username,
             email=email,
             name=name,
             last_name=last_name,
@@ -36,31 +36,20 @@ class UserManager(BaseUserManager):
     def create_user(self, username, email, name, last_name, password=None, **extra_fields):
         return self._create_user(username, email, name, last_name, password, is_staff=False, is_superuser=False, **extra_fields)
 
-    def create_superuser(self, email, name, last_name, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('priority', 'H')  # Prioridad alta para superusers
-        extra_fields.setdefault('role_id', Role.objects.get(role_id=1))  # Asume que 1 es el ID para rol admin
-        
-        return self._create_user(
-            email=email,
-            name=name,
-            last_name=last_name,
-            password=password,
-            **extra_fields
-        )
+    def create_superuser(self, username, email, name, last_name, password=None, **extra_fields):
+        return self._create_user(username, email, name, last_name, password, is_staff=True, is_superuser=True, **extra_fields)
 
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractUser):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=150)
     name = models.CharField(max_length=150)
     age = models.IntegerField(default=0)
-    condition = models.BooleanField(default=None)
+    condition = models.BooleanField(null=True, default=None)
     role_id = models.ForeignKey(
         Role, on_delete=models.CASCADE, db_column='role_id')
-    priority = models.CharField(max_length=150, default=None)
+    priority = models.CharField(max_length=150, null=True, default=None)
     last_name = models.CharField(max_length=150)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -69,27 +58,14 @@ class CustomUser(AbstractBaseUser):
     objects = UserManager()
 
     class Meta:
-        db_table = 'customuser'
-        managed = False
+        db_table = 'custom_user'  
+         
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'last_name']
+    REQUIRED_FIELDS = ['username']
 
     def get_full_name(self):
         return f'{self.name} {self.last_name}'
 
     def __str__(self):
         return f'{self.name} {self.last_name}'
-
-    def has_module_perms(self, app_label):
-    
-        if self.is_superuser:
-            return True
- 
-        return self.get_all_permissions(app_label=app_label)  
-    def has_perm(self, perm, obj=None):
-    
-        if self.is_superuser:
-            return True
-     
-        return self.user_permissions.filter(codename=perm).exists()

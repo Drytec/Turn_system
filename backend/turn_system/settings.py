@@ -28,24 +28,21 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.staticfiles',
-    'coreapi',
     'corsheaders',
     'drf_yasg',
-    'apps.user',
+    'apps.custom_user',
     'apps.place',
     'apps.turn',
     'apps.service',
 ]
 
-AUTH_USER_MODEL = 'user.CustomUser'
+AUTH_USER_MODEL = 'custom_user.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
+    #'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated']
 }
 
 
@@ -99,23 +96,19 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'turn_system',
         'USER': 'postgres',
-       'PASSWORD': 'aP4sw0rd',
+        'PASSWORD': 'aP4sw0rd',
         'HOST': 'localhost',
         'PORT': '5433',
         'OPTIONS': {
-           'options': '-c client_encoding=UTF8',
-       },
+            'options': '-c client_encoding=UTF8',
+        },
     }
 }
-
-
-
-#Cors authorization
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://localhost:3000",
 ]
 CORS_ORIGINS_WHITELIST = [
-    "http://localhost:5173",
+    "http://localhost:3000",
 ]
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

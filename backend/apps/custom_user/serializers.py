@@ -36,14 +36,13 @@ class UserListSerializer(serializers.ModelSerializer):
         return {'Nombre del usuario': data['name'],
                 'Correo electronico:': data['email'],
                 'Prioridad': priority,
-                'role_id': data['role_id']
                 }
 
 
 class UserCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'name', 'last_name', 'age', 'condition']
+        fields = ['email', 'password', 'name', 'age', 'condition']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -61,7 +60,9 @@ class UserCreationSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
-class UserWorkerCreationSerializer(serializers.ModelSerializer):
+
+
+class UserEmployeeCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'password', 'name', 'last_name','age', 'condition','role_id']
@@ -73,7 +74,8 @@ class UserWorkerCreationSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
-class UserWorkerListSerializer(serializers.ModelSerializer):
+    
+class UserEmployeeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = '__all__'
@@ -81,5 +83,4 @@ class UserWorkerListSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         return {'Nombre del usuario': data['name'],
-                'Correo electronico:': data['email'],
-                }
+                'Correo electronico:': data['email'],}

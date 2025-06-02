@@ -1,6 +1,6 @@
 from ..place.models import Place
 from django.db import models
-from ..user.models import CustomUser
+from ..custom_user.models import CustomUser
 
 
 # Create your models here.
@@ -9,6 +9,7 @@ class Turn(models.Model):
     turn_name = models.CharField(max_length=5)
     turn_priority = models.CharField(max_length=1)
     active = models.BooleanField(default=True)
+    canceled = models.BooleanField(default=False)
     attended_by = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, db_column='attended_by', null=True, related_name='attended_turns')
     owner = models.ForeignKey(

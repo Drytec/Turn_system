@@ -2,14 +2,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import ServiceSerializer
+from ..custom_user.models import CustomUser
 from .models import Service
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class ServiceListAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
     def get(self, request):
         services = Service.objects.all()
         serializer = ServiceSerializer(services, many=True)
@@ -30,7 +27,7 @@ class ServiceListAPIView(APIView):
 class ServiceDetailAPIView(APIView):
     def get_service(self, sid):
         return Service.objects.filter(service_id=sid).first()
-
+    
     def get(self, request, sid):
         service = self.get_service(sid)
         serializer = ServiceSerializer(service)
