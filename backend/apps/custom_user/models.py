@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
 class Role(models.Model):
@@ -8,7 +8,7 @@ class Role(models.Model):
 
     class Meta:
         db_table = 'role'
-        managed = True  
+        managed = False
 
     def __str__(self):
         return self.role_name
@@ -40,7 +40,7 @@ class UserManager(BaseUserManager):
         return self._create_user(username, email, name, last_name, password, is_staff=True, is_superuser=True, **extra_fields)
 
 
-class CustomUser(AbstractUser):
+class CustomUser(AbstractBaseUser):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=150)
@@ -58,11 +58,10 @@ class CustomUser(AbstractUser):
     objects = UserManager()
 
     class Meta:
-        db_table = 'custom_user'  
-         
+        db_table = 'custom_user'
+        managed = False
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
 
     def get_full_name(self):
         return f'{self.name} {self.last_name}'

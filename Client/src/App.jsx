@@ -17,7 +17,7 @@ function App() {
         <Route path="/registro" element={<Register />}/>
         <Route path="/turno" element={<Turno />}/>
         <Route path="/crear" element={<Crear />}/>
-        <Route path="/placeStats" element={<PlaceStats />} />
+        <Route path="/puestos/:id/placeStats" element={<PlaceStats />} />
       </Routes>
     </BrowserRouter>
   );

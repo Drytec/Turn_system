@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import TurnAPIView, CloseTurnAPIView, NextTurnAPIView, UserActiveTurnAPIView, UserTurnsAPIView, CancelTurnAPIView
-
+from .views import avg_attendacy_time
 
 urlpatterns = [
     path('user_turns/<int:uid>', UserTurnsAPIView.as_view(), name='user_turns'),
@@ -12,5 +12,6 @@ urlpatterns = [
     path('user_active_turn/<int:uid>',
          UserActiveTurnAPIView.as_view(), name='user_active_turn'),
     path('next_turn/<int:uid>/<int:pid>',
-         NextTurnAPIView.as_view(), name='next_turn')
+         NextTurnAPIView.as_view(), name='next_turn'),
+     path('avg_attendacy_time/<int:pid>/', avg_attendacy_time, name='avg_attendacy_time'),
 ]

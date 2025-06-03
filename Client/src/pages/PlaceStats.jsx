@@ -7,18 +7,19 @@ import {
 import { Card, CardContent } from '../components/card';
 
 export default function PlaceStats() {
-  const { id } = useParams(); // id del puesto desde la URL
+  const { id } = useParams(); 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [error, setError] = useState(null);
-  //console.log("Obteniendo estadísticas del puesto con ID:", placeId);
-  useEffect(() => {
 
+  useEffect(() => {
+    console.log("Obteniendo estadísticas del puesto con ID:", id);
     const fetchStats = async () => {
       try {
         const data = await getPlaceStats(id);
         setStats(data);
       } catch (err) {
+        console.error("Error al obtener estadísticas:", err);
         setError("No se pudo cargar estadísticas. Revisá si el backend está corriendo o si el ID es válido.");
         console.error(err);
       } finally {
@@ -32,7 +33,7 @@ export default function PlaceStats() {
   if (loading) return <p className="text-center mt-8">Cargando estadísticas...</p>;
   if (error) return <p className="text-red-500 text-center mt-8">{error}</p>;
 
-  // Preparar datos para Recharts
+
   const chartData = [
     { name: 'Atendidos', value: stats.total_attended_turns },
     { name: 'No Atendidos', value: stats.total_unattended_turns },
