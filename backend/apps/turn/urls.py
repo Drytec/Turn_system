@@ -12,6 +12,5 @@ urlpatterns = [
     path('user_active_turn/<int:uid>',
          UserActiveTurnAPIView.as_view(), name='user_active_turn'),
     path('next_turn/<int:uid>/<int:pid>',
-         NextTurnAPIView.as_view(), name='next_turn'),
-     path('avg_attendacy_time/<int:pid>/', avg_attendacy_time, name='avg_attendacy_time'),
+         NextTurnAPIView.as_view(), name='next_turn')
 ]
