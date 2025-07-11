@@ -15,8 +15,13 @@ export const getPlaceStats = async (placeName) => {
 
     const allStats = await res.json();
 
-    console.log("Buscando estadísticas del puesto:", placeName);
-    console.log("Lista de puestos disponibles:", allStats[0].place_statistics.map(p => p.place_name));
+    console.log("🟡 Buscando estadísticas del puesto:", placeName);
+    console.log("📋 Lista de puestos disponibles:");
+    allStats[0].place_statistics.forEach(place => {
+      console.log("➡️", place.place_name.toLowerCase().trim());
+    });
+
+    console.log("🔎 Comparando con:", placeName.toLowerCase().trim());
 
     const matchedPlace = allStats[0].place_statistics.find(
       (place) => place.place_name.toLowerCase().trim() === placeName.toLowerCase().trim()
@@ -31,7 +36,7 @@ export const getPlaceStats = async (placeName) => {
     };
 
   } catch (error) {
-    console.error("Error en getPlaceStats:", error.message);
+    console.error("🔴 Error en getPlaceStats:", error.message);
     throw error;
   }
 };
