@@ -6,4 +6,4 @@
 
 -- Create database with turn_system
 -- structure
-CREATE DATABASE turn;
+CREATE DATABASE turn_system;
