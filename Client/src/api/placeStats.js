@@ -1,15 +1,25 @@
 import axios from 'axios';
-
+import { getUserDataFromToken } from './utils'; 
 
 export const getPlaceStats = async (placeName) => {
   const token = localStorage.getItem('token');
 
+  if (!token) {
+    console.error("🔴 No hay token en localStorage");
+    throw new Error("No autenticado");
+  }
+
   try {
-    const res = await fetch(`http://127.0.0.1:8000/stats/`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const res = await fetch('http://127.0.0.1:8000/stats/', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!res.ok) {
+      const errorText = await res.text();
+      console.error("🔴 Error al obtener estadísticas:", errorText);
       throw new Error('Error al obtener estadísticas');
     }
 
@@ -17,13 +27,11 @@ export const getPlaceStats = async (placeName) => {
 
     console.log("🟡 Buscando estadísticas del puesto:", placeName);
     console.log("📋 Lista de puestos disponibles:");
-    allStats[0].place_statistics.forEach(place => {
+    allStats[0]?.place_statistics?.forEach(place => {
       console.log("➡️", place.place_name.toLowerCase().trim());
     });
 
-    console.log("🔎 Comparando con:", placeName.toLowerCase().trim());
-
-    const matchedPlace = allStats[0].place_statistics.find(
+    const matchedPlace = allStats[0]?.place_statistics?.find(
       (place) => place.place_name.toLowerCase().trim() === placeName.toLowerCase().trim()
     );
 
@@ -31,9 +39,7 @@ export const getPlaceStats = async (placeName) => {
       throw new Error("No se encontró el puesto solicitado.");
     }
 
-    return {
-      ...matchedPlace,
-    };
+    return matchedPlace;
 
   } catch (error) {
     console.error("🔴 Error en getPlaceStats:", error.message);
