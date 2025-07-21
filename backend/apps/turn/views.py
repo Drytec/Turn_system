@@ -1,10 +1,13 @@
 import math
+
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from django.utils import timezone
 from datetime import timedelta
 from ..custom_user.models import CustomUser
+from ..custom_user.authentication_mixin import IsUserRole,IsAdminRole,IsWorkerRole
 from .models import Turn
 from ..place.models import Place
 from .serializers import TurnSerializer, CreateTurnSerializer
@@ -18,6 +21,7 @@ def avg_attendacy_time(turns):
 
 
 class UserTurnsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
 
@@ -37,6 +41,7 @@ class UserTurnsAPIView(APIView):
 
 
 class UserActiveTurnAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
 
@@ -70,6 +75,7 @@ class UserActiveTurnAPIView(APIView):
 
 
 class CloseTurnAPIView(APIView):
+    permission_classes = [IsAuthenticated,IsWorkerRole]
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -95,6 +101,7 @@ class CloseTurnAPIView(APIView):
 
 
 class CancelTurnAPIView(APIView):
+    permission_classes = [IsAuthenticated,IsWorkerRole]
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -113,6 +120,7 @@ class CancelTurnAPIView(APIView):
 
 
 class TurnDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -127,7 +135,8 @@ class TurnDetailAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class TurnAPIView(APIView):    
+class TurnAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         turns = Turn.objects.all()
         serializer = TurnSerializer(turns, many=True)
@@ -165,7 +174,9 @@ class TurnAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class NextTurnAPIView(APIView):    
+class NextTurnAPIView(APIView):
+    permission_classes = [IsAuthenticated,IsWorkerRole]
+
     def get_place(self, pid):
         return Place.objects.filter(id=pid).first()
 

@@ -1,3 +1,4 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -7,6 +8,7 @@ from .models import Service
 
 
 class ServiceListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         services = Service.objects.all()
         serializer = ServiceSerializer(services, many=True)
@@ -25,6 +27,7 @@ class ServiceListAPIView(APIView):
 
 
 class ServiceDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get_service(self, sid):
         return Service.objects.filter(service_id=sid).first()
     

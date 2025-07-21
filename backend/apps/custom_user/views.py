@@ -1,10 +1,12 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+from .authentication_mixin import IsAdminRole
 from .serializers import UserSerializer, UserListSerializer, UserCreationSerializer, UserEmployeeListSerializer, UserEmployeeCreationSerializer
 from .models import CustomUser
 from .serializers import CustomTokenObtainPairSerializer
@@ -16,6 +18,7 @@ def get_user(self, uid):
 
 @api_view(['GET', 'POST', 'DELETE'])
 def user_employee_api_view(request):
+    permission_classes = [IsAuthenticated,IsAdminRole]
     if request.method == 'GET':
         users = CustomUser.objects.filter(role_id=3)
         # turn = turn.objects.filter(user_id=request.user.id)
@@ -33,7 +36,6 @@ def user_employee_api_view(request):
 def user_api_view(request):
     if request.method == 'GET':
         users = CustomUser.objects.all()
-       # turn = turn.objects.filter(user_id=request.user.id)
         serializer = UserListSerializer(users, many=True)
         return Response(serializer.data)
     elif request.method == 'POST':
