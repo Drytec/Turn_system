@@ -8,7 +8,7 @@ Under construction
 
 ## 1. Create sql files:
 
-Create a db folder and include the following files:
+Create a db        folder and include the following files:
 
 - `schema.sql`: Contains the SQL statements for create tables [using DDL]
 - `data.sql`: Contains the SQL statements for insert initial data [using DML]

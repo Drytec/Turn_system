@@ -12,6 +12,6 @@ INSERT INTO service (service_name, service_desc) VALUES
     ('PQRs','Servicio al Cliente');
 
 INSERT INTO place (service_id, place_name) VALUES
-    (1, 'Puesto 1'),
-    (2, 'Puesto 2'),
-    (3, 'Puesto 3');
+    (1, 'Area de Consultas'),
+    (2, 'Laboratorio'),
+    (3, 'Atencion al cliente');
