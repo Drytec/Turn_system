@@ -1,48 +1,36 @@
 import axios from 'axios';
-import { getUserDataFromToken } from './utils'; 
+
+const statsApi = axios.create({
+  baseURL: 'http://127.0.0.1:8000',
+});
+
+statsApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const getPlaceStats = async (placeName) => {
-  const token = localStorage.getItem('token');
-
-  if (!token) {
-    console.error("🔴 No hay token en localStorage");
-    throw new Error("No autenticado");
-  }
-
   try {
-    const res = await fetch('http://127.0.0.1:8000/stats/', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const res = await statsApi.get('/stats/');
+    const allStats = res.data;
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("🔴 Error al obtener estadísticas:", errorText);
-      throw new Error('Error al obtener estadísticas');
-    }
+    console.log("Buscando estadísticas del puesto:", placeName);
+    console.log("Lista de puestos disponibles:", allStats[0].place_statistics.map(p => p.place_name));
 
-    const allStats = await res.json();
-
-    console.log("🟡 Buscando estadísticas del puesto:", placeName);
-    console.log("📋 Lista de puestos disponibles:");
-    allStats[0]?.place_statistics?.forEach(place => {
-      console.log("➡️", place.place_name.toLowerCase().trim());
-    });
-
-    const matchedPlace = allStats[0]?.place_statistics?.find(
-      (place) => place.place_name.toLowerCase().trim() === placeName.toLowerCase().trim()
+    const matchedPlace = allStats[0].place_statistics.find(
+        (place) => place.place_name.toLowerCase().trim() === placeName.toLowerCase().trim()
     );
 
     if (!matchedPlace) {
       throw new Error("No se encontró el puesto solicitado.");
     }
 
-    return matchedPlace;
-
+    return { ...matchedPlace };
   } catch (error) {
-    console.error("🔴 Error en getPlaceStats:", error.message);
+    console.error("Error en getPlaceStats:", error.response?.data || error.message);
     throw error;
   }
 };

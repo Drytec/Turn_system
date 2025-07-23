@@ -36,10 +36,10 @@ export default function PlaceStats() {
   if (error) return <p className="text-red-500 text-center mt-8">{error}</p>;
 
   const chartData = [
-    { name: 'Atendidos', value: stats.attended_turn_count },
-    { name: 'Activos', value: stats.active_turn_count },
-    { name: 'Cancelados', value: stats.canceled_turn_count },
-    { name: 'Prom. Atención', value: parseFloat(stats.avg_attendancy_time) || 0 },
+    { name: 'Atendidos', value: stats.attendedTurns },
+    { name: 'Activos', value: stats.activeTurns },
+    { name: 'Cancelados', value: stats.canceledTurns },
+    { name: 'Prom. Atención', value: parseFloat(stats.averageTime) || 0 },
   ];
 
   return (
@@ -65,4 +65,3 @@ export default function PlaceStats() {
     </div>
   );
 }
-
