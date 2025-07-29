@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPlace } from '../api/crearPuestos';
 import { createService } from '../api/crearServicio';
+import { createEmployee } from '../api/crearEmpleados';
 import { fetchPuestos } from '../api/puestos'; // Traemos la función para obtener los puestos
 
 const Crear = () => {
@@ -12,19 +13,29 @@ const Crear = () => {
     service_desc: ''
   });
 
-  const [puestos, setPuestos] = useState([]); // Nuevo estado para los puestos
+  // 🔥 Nuevo estado para empleados
+  const [employeeData, setEmployeeData] = useState({
+    email: '',
+    password: '',
+    name: '',
+    last_name: '',
+    age: '',
+    condition: ''
+  });
+
+  const [puestos, setPuestos] = useState([]);
 
   useEffect(() => {
     const obtenerPuestos = async () => {
       try {
-        const data = await fetchPuestos(); // Llama a la función que obtiene los puestos
-        setPuestos(data); // Guarda los puestos en el estado
+        const data = await fetchPuestos();
+        setPuestos(data);
       } catch (error) {
         console.error('Error al obtener los puestos:', error);
       }
     };
     obtenerPuestos();
-  }, []); // Solo se ejecuta una vez al montar el componente
+  }, []);
 
   const handleButtonClick = (formType) => {
     setCurrentForm(formType);
@@ -33,38 +44,44 @@ const Crear = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (currentForm === 'employee') {
+      setEmployeeData(prev => ({ ...prev, [name]: value }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
+  // ✅ Nuevo método para enviar empleados
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (currentForm === 'place') {
-        // 1. Crear el servicio
         const newService = await createService({
           service_name: formData.service_name,
           service_desc: formData.service_desc
         });
 
-        // 2. Luego crear el puesto con el ID del servicio recién creado
         await createPlace({
           place_name: formData.place_name,
-          service_id: newService.service_id  // o newService.service_id según lo que retorne tu API
+          service_id: newService.service_id
         });
-      } else {
+      } else if (currentForm === 'service') {
         await createService({
           service_name: formData.service_name,
           service_desc: formData.service_desc
         });
+      } else if (currentForm === 'employee') {
+        const response = await createEmployee(employeeData);
+        if (response.success) {
+          alert("✅ Empleado creado con éxito!");
+        } else {
+          alert("❌ Error: " + JSON.stringify(response.error));
+        }
       }
 
       setShowModal(false);
-      setFormData({
-        place_name: '',
-        service_name: '',
-        service_desc: ''
-      });
-      alert(`${currentForm === 'place' ? 'Puesto y servicio' : 'Servicio'} creados exitosamente!`);
+      setFormData({ place_name: '', service_name: '', service_desc: '' });
+      setEmployeeData({ email: '', password: '', name: '', last_name: '', age: '', condition: '' });
     } catch (error) {
       alert(`Error al crear: ${error.response?.data?.message || error.message}`);
     }
@@ -73,93 +90,105 @@ const Crear = () => {
   return (
     <div style={styles.wrapper}>
       <h1 style={styles.heading}>Panel de Administración</h1>
-      
+
       <div style={styles.buttonGroup}>
-        <button 
-          style={styles.actionButton}
-          onClick={() => handleButtonClick('place')}
-        >
+        <button style={styles.actionButton} onClick={() => handleButtonClick('place')}>
           Crear Puesto
         </button>
-        
-        <button 
-          style={styles.actionButton}
-          onClick={() => handleButtonClick('service')}
-        >
+
+        <button style={styles.actionButton} onClick={() => handleButtonClick('service')}>
           Crear Servicio
         </button>
+
+        {/* ✅ Nuevo botón */}
+        <button style={styles.actionButton} onClick={() => handleButtonClick('employee')}>
+          Crear Empleado
+        </button>
       </div>
-  
+
       {showModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
-            <button 
-              style={styles.closeButton}
-              onClick={() => setShowModal(false)}
-            >
-              ×
-            </button>
-            
+            <button style={styles.closeButton} onClick={() => setShowModal(false)}>×</button>
+
             <h2 style={{...styles.heading, fontSize: '1.8rem', marginBottom: '1.5rem'}}>
-              {currentForm === 'place' ? 'Nuevo Puesto + Servicio' : 'Nuevo Servicio'}
+              {currentForm === 'place' && 'Nuevo Puesto + Servicio'}
+              {currentForm === 'service' && 'Nuevo Servicio'}
+              {currentForm === 'employee' && 'Nuevo Empleado'}
             </h2>
-            
+
             <form onSubmit={handleSubmit}>
-              {currentForm === 'place' && (
+              {/* 👉 FORMULARIO DE EMPLEADO */}
+              {currentForm === 'employee' && (
+                <>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Nombre:</label>
+                    <input type="text" name="name" value={employeeData.name} onChange={handleInputChange} style={styles.input} required />
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Apellido:</label>
+                    <input type="text" name="last_name" value={employeeData.last_name} onChange={handleInputChange} style={styles.input} required />
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Correo:</label>
+                    <input type="email" name="email" value={employeeData.email} onChange={handleInputChange} style={styles.input} required />
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Contraseña:</label>
+                    <input type="password" name="password" value={employeeData.password} onChange={handleInputChange} style={styles.input} required />
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Edad:</label>
+                    <input type="number" name="age" value={employeeData.age} onChange={handleInputChange} style={styles.input} />
+                  </div>
+
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Condición:</label>
+                    <select
+                      name="condition"
+                      value={formData.condition}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    >
+                      <option value="">-- Selecciona --</option>
+                      <option value={true}>Activo</option>
+                      <option value={false}>Inactivo</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* 👉 FORMULARIOS DE SERVICIO Y PUESTO (ya existentes) */}
+              {currentForm !== 'employee' && currentForm === 'place' && (
                 <div style={styles.formGroup}>
                   <label style={styles.label}>Nombre del Puesto:</label>
-                  <input
-                    type="text"
-                    name="place_name"
-                    value={formData.place_name}
-                    onChange={handleInputChange}
-                    style={styles.input}
-                    required
-                  />
+                  <input type="text" name="place_name" value={formData.place_name} onChange={handleInputChange} style={styles.input} required />
                 </div>
               )}
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Nombre del Servicio:</label>
-                <input
-                  type="text"
-                  name="service_name"
-                  value={formData.service_name}
-                  onChange={handleInputChange}
-                  style={styles.input}
-                  required
-                />
-              </div>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Descripción:</label>
-                <textarea
-                  name="service_desc"
-                  value={formData.service_desc}
-                  onChange={handleInputChange}
-                  style={styles.textarea}
-                  required
-                />
-              </div>
 
-              <button type="submit" style={styles.submitButton}>
-                Crear
-              </button>
+              {currentForm !== 'employee' && (
+                <>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Nombre del Servicio:</label>
+                    <input type="text" name="service_name" value={formData.service_name} onChange={handleInputChange} style={styles.input} required />
+                  </div>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Descripción:</label>
+                    <textarea name="service_desc" value={formData.service_desc} onChange={handleInputChange} style={styles.textarea} required />
+                  </div>
+                </>
+              )}
+
+              <button type="submit" style={styles.submitButton}>Crear</button>
             </form>
           </div>
         </div>
       )}
-
-      <div style={styles.puestosContainer}>
-        <h2 style={styles.puestosHeading}>Lista de Puestos</h2>
-        <ul style={styles.puestosList}>
-          {puestos.map((puesto) => (
-            <li key={puesto.place_id} style={styles.puestoItem}>
-              <strong>Puesto:</strong> {puesto.place_name}<br />
-              <strong>Servicio:</strong> {puesto.service?.service_name}<br />
-              <strong>Descripción:</strong> {puesto.service?.service_desc}
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };

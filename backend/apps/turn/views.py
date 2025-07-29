@@ -21,7 +21,6 @@ def avg_attendacy_time(turns):
 
 
 class UserTurnsAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
 
@@ -41,7 +40,6 @@ class UserTurnsAPIView(APIView):
 
 
 class UserActiveTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
 
@@ -85,7 +83,6 @@ class UserActiveTurnAPIView(APIView):
 
 
 class CloseTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated,IsWorkerRole]
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -111,7 +108,6 @@ class CloseTurnAPIView(APIView):
 
 
 class CancelTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated,IsWorkerRole]
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -130,7 +126,6 @@ class CancelTurnAPIView(APIView):
 
 
 class TurnDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -146,7 +141,6 @@ class TurnDetailAPIView(APIView):
 
 
 class TurnAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self, request):
         turns = Turn.objects.all()
         serializer = TurnSerializer(turns, many=True)
@@ -185,10 +179,9 @@ class TurnAPIView(APIView):
 
 
 class NextTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated,IsWorkerRole]
 
     def get_place(self, pid):
-        return Place.objects.filter(id=pid).first()
+        return Place.objects.filter(place_id=pid).first()
 
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()

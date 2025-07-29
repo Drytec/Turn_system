@@ -11,7 +11,6 @@ from .models import Place, PlaceCustomUser
 
 
 class PlaceListAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self, request):
         places = Place.objects.all()
         serializer = PlaceGETSerializer(places, many=True)
@@ -21,7 +20,6 @@ class PlaceListAPIView(APIView):
 
 
 class PlaceCreateAPIView(CreateAPIView):
-    permission_classes = [IsAuthenticated,IsAdminRole]
     def post(self, request):
         serializer = PlaceSerializer(data=request.data)
 
@@ -35,7 +33,6 @@ class PlaceCreateAPIView(CreateAPIView):
 
 
 class PlaceDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated,IsAdminRole]
     def get_place(self, pid):
         return Place.objects.filter(place_id=pid).first()
 
@@ -75,7 +72,6 @@ class PlaceDetailAPIView(APIView):
 
 
 class UserPlacesDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     def get_place(self, pid):
         return CustomUser.objects.filter(place_id=pid).first()
 
@@ -93,7 +89,6 @@ class UserPlacesDetailAPIView(APIView):
 
 
 class AddUserToPlaceAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     def get_place(self, pid):
         return CustomUser.objects.filter(place_id=pid).first()
     

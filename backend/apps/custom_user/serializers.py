@@ -33,7 +33,9 @@ class UserListSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         priority = 'Alta' if data['priority'] == 'H' else (
             'Media' if data['priority'] == 'M' else 'Estándar')
-        return {'Nombre del usuario': data['name'],
+        return {'id': data['id'],  
+                'role_id': data['role_id'],
+                'Nombre del usuario': data['name'],
                 'Correo electronico:': data['email'],
                 'Prioridad': priority,
                 }
@@ -70,7 +72,7 @@ class UserEmployeeCreationSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
     def create(self, validated_data):
-        user = CustomUser.objects.create(**validated_data)
+        user = CustomUser(**validated_data)
         user.set_password(validated_data['password'])
         user.role_id = Role.objects.get(role_id=3)
         user.save()

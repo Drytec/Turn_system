@@ -73,7 +73,7 @@ export const crearPuesto = async (puestoData) => {
 // Función adicional para obtener detalles de un puesto
 export const fetchPuestoById = async (id) => {
   try {
-    const response = await api.get(`/places/${id}/`);
+    const response = await api.get(`/place/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener puesto ${id}:`, error);

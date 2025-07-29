@@ -45,10 +45,13 @@ const Login = () => {
         console.log('Role ID:', roleId);
         
         // Navegación basada en roles
-        navigate(roleId === 1 ? '/crear' : '/puestos', { 
-          replace: true,
-          state: { freshLogin: true }
-        });
+        if (roleId === 1) {
+          navigate('/crear', { replace: true, state: { freshLogin: true } }); // Admin
+        } else if (roleId === 3) {
+          navigate('/trabajador', { replace: true, state: { freshLogin: true } }); // Trabajador
+        } else {
+          navigate('/puestos', { replace: true, state: { freshLogin: true } }); // Cliente
+        }
       } else {
         navigate('/puestos', { replace: true });
       }
