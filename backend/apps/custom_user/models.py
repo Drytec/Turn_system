@@ -15,12 +15,11 @@ class Role(models.Model):
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, username, email, name, last_name, password, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, email, name, last_name, password, is_staff, is_superuser, **extra_fields):
         if not email:
             raise ValueError("El usuario debe tener un correo electrónico")
         email = self.normalize_email(email)
         user = self.model(
-            username=username,
             email=email,
             name=name,
             last_name=last_name,
@@ -33,11 +32,11 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, username, email, name, last_name, password=None, **extra_fields):
-        return self._create_user(username, email, name, last_name, password, is_staff=False, is_superuser=False, **extra_fields)
+    def create_user(self, email, name, last_name, password=None,**extra_fields):
+        return self._create_user( email, name, last_name, password, is_staff=False, is_superuser=False,**extra_fields)
 
-    def create_superuser(self, username, email, name, last_name, password=None, **extra_fields):
-        return self._create_user(username, email, name, last_name, password, is_staff=True, is_superuser=True, **extra_fields)
+    def create_superuser(self, email, name, last_name, password=None,**extra_fields):
+        return self._create_user( email, name, last_name, password, is_staff=True,is_superuser=True, **extra_fields)
 
 
 class CustomUser(AbstractBaseUser):
