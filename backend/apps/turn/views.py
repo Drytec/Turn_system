@@ -117,6 +117,9 @@ class CancelTurnAPIView(APIView):
         if not turn:
             return Response({'message': 'Turno no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
+        if not request.user == turn.owner:
+            return Response({'message': 'No tiene permiso.'}, status=status.HTTP_403_FORBIDDEN)
+
         turn.active = False
         turn.canceled = True
         turn.date_closed = timezone.now()
