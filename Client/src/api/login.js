@@ -11,6 +11,8 @@ export const getLogin = async ({ email, password }) => {
     email,
     password,
   });
+  localStorage.setItem('access_token', response.data.access);
+  localStorage.setItem('refresh_token', response.data.refresh);
   console.log('Datos de login:', response.data); 
   return response.data;
 };

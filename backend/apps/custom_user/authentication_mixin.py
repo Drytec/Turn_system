@@ -1,5 +1,6 @@
 from rest_framework import authentication, exceptions
 from rest_framework.authentication import get_authorization_header
+from rest_framework.permissions import BasePermission
 
 from .authenticate import ExpiringTokenAuthentication
 
@@ -37,3 +38,17 @@ class Authentication(authentication.BaseAuthentication):
         return (self.user, 1)
 
 
+class IsAdminRole(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_authenticated and user.role_id == 1
+
+class IsWorkerRole(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_authenticated and (user.role_id == 3 or user.role_id == 1)
+
+class IsUserRole(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return user.is_authenticated and user.role_id == 2

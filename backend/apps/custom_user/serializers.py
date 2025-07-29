@@ -65,13 +65,14 @@ class UserCreationSerializer(serializers.ModelSerializer):
 class UserEmployeeCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'name', 'last_name','age', 'condition','role_id']
+        fields = ['email', 'password', 'name', 'last_name','age', 'condition']
         extra_kwargs = {
             'password': {'write_only': True}
         }
     def create(self, validated_data):
         user = CustomUser.objects.create(**validated_data)
         user.set_password(validated_data['password'])
+        user.role_id = Role.objects.get(role_id=3)
         user.save()
         return user
     

@@ -34,3 +34,4 @@ export const getPlaceStats = async (placeName) => {
     throw error;
   }
 };
+

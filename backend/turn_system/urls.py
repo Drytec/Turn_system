@@ -27,5 +27,6 @@ urlpatterns = [
     path('turn/', include('apps.turn.urls')),
     path('service/', include('apps.service.urls')),
     path('user/', include('apps.custom_user.urls')),
-    path('stats/', StatsAPIView.as_view(), name='stats')
+    path('stats/', StatsAPIView.as_view()),
+    path('stats/<int:pk>/', StatsAPIView.as_view()),
 ]
