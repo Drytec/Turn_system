@@ -12,3 +12,6 @@ qrcode~=8.0
 django-rest-swagger
 drf-yasg
 djangorestframework-simplejwt
+gunicorn==23.0.0
+uvicorn==0.32.1
+whitenoise==6.8.2
