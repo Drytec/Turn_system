@@ -70,8 +70,18 @@ class UserActiveTurnAPIView(APIView):
             expected_minutes = 5.0
 
         serializer = TurnSerializer(turn)
+        
+        next_turn = Turn.objects.filter(
+            place_id=turn.place_id,
+            turn_priority=turn.turn_priority,
+            active=True
+        ).order_by('date_created').first()
 
-        return Response({**serializer.data, 'expected_attendacy_time': expected_minutes}, status=status.HTTP_200_OK)
+        is_next = (next_turn and next_turn.id == turn.id)
+
+        serializer = TurnSerializer(turn)
+        
+        return Response({**serializer.data, 'expected_attendacy_time': expected_minutes, 'is_next': is_next}, status=status.HTTP_200_OK)
 
 
 class CloseTurnAPIView(APIView):
