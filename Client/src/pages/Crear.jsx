@@ -2,16 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { createPlace } from '../api/crearPuestos';
 import { createService } from '../api/crearServicio';
 import { createEmployee } from '../api/crearEmpleados';
+import { fetchEmpleados } from '../api/crearEmpleados';
+import { assignUserToPlace } from '../api/puestos';
 import { fetchPuestos } from '../api/puestos'; // Traemos la función para obtener los puestos
 
 const Crear = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentForm, setCurrentForm] = useState(null);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedEmpleado, setSelectedEmpleado] = useState("");
+  const [selectedPuesto, setSelectedPuesto] = useState("");
   const [formData, setFormData] = useState({
     place_name: '',
     service_name: '',
     service_desc: ''
   });
+
+  const handleOpenAssignModal = () => {
+    setShowAssignModal(true);
+  };
+
+  const handleAssign = async () => {
+    if (!selectedEmpleado || !selectedPuesto) {
+      alert("Debes seleccionar un empleado y un puesto");
+      return;
+    }
+
+    const result = await assignUserToPlace(selectedEmpleado, selectedPuesto);
+
+    if (result.success) {
+      alert("✅ Puesto asignado correctamente");
+      setShowAssignModal(false);
+      setSelectedEmpleado("");
+      setSelectedPuesto("");
+    } else {
+      alert("❌ Error asignando puesto");
+    }
+  };
 
   // 🔥 Nuevo estado para empleados
   const [employeeData, setEmployeeData] = useState({
@@ -22,6 +49,21 @@ const Crear = () => {
     age: '',
     condition: ''
   });
+
+  const [empleados, setEmpleados] = useState([]);
+
+  useEffect(() => {
+    const obtenerEmpleados = async () => {
+      try {
+        const data = await fetchEmpleados();
+        setEmpleados(data);
+        console.log("📥 Empleados recibidos:", data); 
+      } catch (error) {
+        console.error('Error al obtener empleados:', error);
+      }
+    };
+    obtenerEmpleados();
+  }, []);
 
   const [puestos, setPuestos] = useState([]);
 
@@ -91,104 +133,296 @@ const Crear = () => {
     <div style={styles.wrapper}>
       <h1 style={styles.heading}>Panel de Administración</h1>
 
+      {/* 📌 Botones de acciones principales */}
       <div style={styles.buttonGroup}>
-        <button style={styles.actionButton} onClick={() => handleButtonClick('place')}>
+        <button 
+          style={styles.actionButton}
+          onClick={() => handleButtonClick('place')}
+        >
           Crear Puesto
         </button>
-
-        <button style={styles.actionButton} onClick={() => handleButtonClick('service')}>
+        
+        <button 
+          style={styles.actionButton}
+          onClick={() => handleButtonClick('service')}
+        >
           Crear Servicio
         </button>
 
-        {/* ✅ Nuevo botón */}
-        <button style={styles.actionButton} onClick={() => handleButtonClick('employee')}>
+        <button 
+          style={styles.actionButton}
+          onClick={() => handleButtonClick('employee')}
+        >
           Crear Empleado
+        </button>
+
+        {/* 🚀 NUEVO BOTÓN PARA ABRIR EL MODAL */}
+        <button 
+          style={styles.actionButton}
+          onClick={handleOpenAssignModal}
+        >
+          Asignar Puesto
         </button>
       </div>
 
+      {/* 📌 MODAL PARA ASIGNAR PUESTO */}
+      {showAssignModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <button 
+              style={styles.closeButton}
+              onClick={() => setShowAssignModal(false)}
+            >
+              ×
+            </button>
+
+            <h2 style={{...styles.heading, fontSize: '1.8rem', marginBottom: '1.5rem'}}>
+              Asignar Puesto a Empleado
+            </h2>
+
+            {/* Select de empleados */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Selecciona un empleado:</label>
+              <select 
+                value={selectedEmpleado} 
+                onChange={(e) => setSelectedEmpleado(e.target.value)}
+                style={styles.input}
+              >
+                <option value="">-- Selecciona un empleado --</option>
+                {empleados.map((empleado) => (
+                  <option key={empleado.id} value={empleado.id}>
+                    {empleado.name} {empleado.last_name} ({empleado.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Select de puestos */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Selecciona un puesto:</label>
+              <select 
+                value={selectedPuesto} 
+                onChange={(e) => setSelectedPuesto(e.target.value)}
+                style={styles.input}
+              >
+                <option value="">-- Selecciona un puesto --</option>
+                {puestos.map((puesto) => (
+                  <option key={puesto.place_id} value={puesto.place_id}>
+                    {puesto.place_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Botón para asignar */}
+            <button 
+              type="button" 
+              style={styles.submitButton} 
+              onClick={handleAssign}
+            >
+              ✅ Asignar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 📌 Modal de creación */}
       {showModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
-            <button style={styles.closeButton} onClick={() => setShowModal(false)}>×</button>
-
+            <button 
+              style={styles.closeButton}
+              onClick={() => setShowModal(false)}
+            >
+              ×
+            </button>
+            
             <h2 style={{...styles.heading, fontSize: '1.8rem', marginBottom: '1.5rem'}}>
-              {currentForm === 'place' && 'Nuevo Puesto + Servicio'}
-              {currentForm === 'service' && 'Nuevo Servicio'}
-              {currentForm === 'employee' && 'Nuevo Empleado'}
+              {currentForm === 'place' 
+                ? 'Nuevo Puesto + Servicio' 
+                : currentForm === 'service' 
+                  ? 'Nuevo Servicio' 
+                  : 'Nuevo Empleado'}
             </h2>
-
+            
+            {/* 📌 Formulario dinámico */}
             <form onSubmit={handleSubmit}>
-              {/* 👉 FORMULARIO DE EMPLEADO */}
+              {/* 🔹 Formulario para Puesto */}
+              {currentForm === 'place' && (
+                <>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Nombre del Puesto:</label>
+                    <input
+                      type="text"
+                      name="place_name"
+                      value={formData.place_name}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    />
+                  </div>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Nombre del Servicio:</label>
+                    <input
+                      type="text"
+                      name="service_name"
+                      value={formData.service_name}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    />
+                  </div>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Descripción:</label>
+                    <textarea
+                      name="service_desc"
+                      value={formData.service_desc}
+                      onChange={handleInputChange}
+                      style={styles.textarea}
+                      required
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* 🔹 Formulario para Servicio */}
+              {currentForm === 'service' && (
+                <>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Nombre del Servicio:</label>
+                    <input
+                      type="text"
+                      name="service_name"
+                      value={formData.service_name}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    />
+                  </div>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Descripción:</label>
+                    <textarea
+                      name="service_desc"
+                      value={formData.service_desc}
+                      onChange={handleInputChange}
+                      style={styles.textarea}
+                      required
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* 🔹 Formulario para Empleado */}
               {currentForm === 'employee' && (
                 <>
                   <div style={styles.formGroup}>
                     <label style={styles.label}>Nombre:</label>
-                    <input type="text" name="name" value={employeeData.name} onChange={handleInputChange} style={styles.input} required />
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name || ""}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    />
                   </div>
-
                   <div style={styles.formGroup}>
                     <label style={styles.label}>Apellido:</label>
-                    <input type="text" name="last_name" value={employeeData.last_name} onChange={handleInputChange} style={styles.input} required />
+                    <input
+                      type="text"
+                      name="last_name"
+                      value={formData.last_name || ""}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    />
                   </div>
-
                   <div style={styles.formGroup}>
                     <label style={styles.label}>Correo:</label>
-                    <input type="email" name="email" value={employeeData.email} onChange={handleInputChange} style={styles.input} required />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email || ""}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    />
                   </div>
-
                   <div style={styles.formGroup}>
                     <label style={styles.label}>Contraseña:</label>
-                    <input type="password" name="password" value={employeeData.password} onChange={handleInputChange} style={styles.input} required />
+                    <input
+                      type="password"
+                      name="password"
+                      value={formData.password || ""}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    />
                   </div>
-
                   <div style={styles.formGroup}>
                     <label style={styles.label}>Edad:</label>
-                    <input type="number" name="age" value={employeeData.age} onChange={handleInputChange} style={styles.input} />
+                    <input
+                      type="number"
+                      name="age"
+                      value={formData.age || ""}
+                      onChange={handleInputChange}
+                      style={styles.input}
+                      required
+                    />
                   </div>
-
                   <div style={styles.formGroup}>
-                    <label style={styles.label}>Condición:</label>
+                    <label style={styles.label}>¿Activo?</label>
                     <select
                       name="condition"
-                      value={formData.condition}
+                      value={formData.condition || ""}
                       onChange={handleInputChange}
                       style={styles.input}
                       required
                     >
-                      <option value="">-- Selecciona --</option>
-                      <option value={true}>Activo</option>
-                      <option value={false}>Inactivo</option>
+                      <option value="">Seleccionar</option>
+                      <option value={true}>Sí</option>
+                      <option value={false}>No</option>
                     </select>
                   </div>
                 </>
               )}
 
-              {/* 👉 FORMULARIOS DE SERVICIO Y PUESTO (ya existentes) */}
-              {currentForm !== 'employee' && currentForm === 'place' && (
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Nombre del Puesto:</label>
-                  <input type="text" name="place_name" value={formData.place_name} onChange={handleInputChange} style={styles.input} required />
-                </div>
-              )}
-
-              {currentForm !== 'employee' && (
-                <>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Nombre del Servicio:</label>
-                    <input type="text" name="service_name" value={formData.service_name} onChange={handleInputChange} style={styles.input} required />
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Descripción:</label>
-                    <textarea name="service_desc" value={formData.service_desc} onChange={handleInputChange} style={styles.textarea} required />
-                  </div>
-                </>
-              )}
-
-              <button type="submit" style={styles.submitButton}>Crear</button>
+              <button type="submit" style={styles.submitButton}>
+                Crear
+              </button>
             </form>
           </div>
         </div>
       )}
+
+      {/* 📌 Lista de Puestos */}
+      <div style={styles.puestosContainer}>
+        <h2 style={styles.puestosHeading}>📍 Lista de Puestos</h2>
+        <ul style={styles.puestosList}>
+          {puestos.map((puesto) => (
+            <li key={puesto.place_id} style={styles.puestoItem}>
+              <strong>Puesto:</strong> {puesto.place_name}<br />
+              <strong>Servicio:</strong> {puesto.service?.service_name}<br />
+              <strong>Descripción:</strong> {puesto.service?.service_desc}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 📌 Lista de Empleados */}
+      <div style={styles.empleadosContainer}>
+        <h2 style={styles.puestosHeading}>👥 Lista de Empleados</h2>
+        <ul style={styles.puestosList}>
+          {empleados.map((empleado) => (
+            <li key={empleado.id} style={styles.puestoItem}>
+              <strong>Nombre:</strong> {empleado.name} {empleado.last_name}<br />
+              <strong>Correo:</strong> {empleado.email}<br />
+              <strong>Edad:</strong> {empleado.age} años<br />
+              <strong>Activo:</strong> {empleado.condition ? "✅ Sí" : "❌ No"}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

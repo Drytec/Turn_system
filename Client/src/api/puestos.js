@@ -80,3 +80,24 @@ export const fetchPuestoById = async (id) => {
     throw error;
   }
 };
+
+export const getPuestosByUser = async (userId) => {
+  try {
+    const response = await api.get(`/place/user_places/${userId}`);
+    console.log("📥 Respuesta cruda de user_places:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error obteniendo puestos del trabajador:", error);
+    return [];
+  }
+};
+
+export const assignUserToPlace = async (userId, placeId) => {
+  try {
+    const response = await api.post(`/place/add_user_to_place/${userId}/${placeId}`);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error("❌ Error asignando puesto:", error.response?.data || error);
+    return { success: false, error: error.response?.data };
+  }
+};

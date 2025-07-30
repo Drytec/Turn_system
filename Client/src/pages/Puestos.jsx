@@ -39,9 +39,12 @@ const Puestos = () => {
       console.log("👤 ID del usuario autenticado:", userId);
 
       const turnoData = { owner: userId, place_id: puestoId };
+      console.log("📤 Datos que envío al backend:", turnoData);
       console.log("🟦 PUESTO ID ENVIADO:", puestoId);
       console.log("📤 ENVIANDO TURNO:", turnoData);
       const response = await crearTurno(turnoData);
+
+      console.log("📥 Respuesta del backend:", response);
 
       if (response.success) {
         setMessage(`✅ Turno creado con éxito: ${response.data.turn_name}`);

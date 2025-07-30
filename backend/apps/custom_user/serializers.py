@@ -85,5 +85,6 @@ class UserEmployeeListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        return {'Nombre del usuario': data['name'],
-                'Correo electronico:': data['email'],}
+        data['Nombre del usuario'] = data['name']
+        data['Correo electronico'] = data['email']
+        return data

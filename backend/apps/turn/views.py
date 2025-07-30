@@ -42,7 +42,6 @@ class UserTurnsAPIView(APIView):
 
 
 class UserActiveTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
@@ -87,7 +86,6 @@ class UserActiveTurnAPIView(APIView):
 
 
 class CloseTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsWorkerRole]
     
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
@@ -114,7 +112,6 @@ class CloseTurnAPIView(APIView):
 
 
 class CancelTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
@@ -137,7 +134,6 @@ class CancelTurnAPIView(APIView):
 
 
 class TurnDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
@@ -154,7 +150,6 @@ class TurnDetailAPIView(APIView):
 
 
 class TurnAPIView(APIView):
-    permission_classes = [IsAuthenticated]
     
     def get(self, request):
         turns = Turn.objects.all()
@@ -177,11 +172,16 @@ class TurnAPIView(APIView):
             turn_count = Turn.objects.filter(
                 place_id=place).count()
 
-            turn_priority = owner.priority
+            turn_priority = owner.priority if owner.priority else "M"
 
             turn_number = (turn_count % 999) + 1
 
             turn_name = f"{turn_priority}-{turn_number:03d}"
+
+            print("🟦 Datos recibidos:", serializer.validated_data)
+            print("🔵 Nombre del turno generado:", turn_name)
+            print("📌 Owner recibido:", owner)
+            print("📂 Campos de owner:", dir(owner))
 
             turn = serializer.save(
                 turn_priority=turn_priority, turn_name=turn_name)
@@ -194,7 +194,6 @@ class TurnAPIView(APIView):
 
 
 class NextTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsWorkerRole]
 
     def get_place(self, pid):
         return Place.objects.filter(place_id=pid).first()

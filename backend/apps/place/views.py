@@ -89,14 +89,16 @@ class UserPlacesDetailAPIView(APIView):
 
 
 class AddUserToPlaceAPIView(APIView):
+
     def get_place(self, pid):
         return CustomUser.objects.filter(place_id=pid).first()
     
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
     
-    def post(self, request):
-        serializer = PlaceCustomUser(data=request.data)
+    def post(self, request, uid, pid):
+        data = {"custom_user_id":uid, "place_id":pid}
+        serializer = PlaceCustomUserSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()

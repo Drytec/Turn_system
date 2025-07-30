@@ -13,3 +13,13 @@ export const createEmployee = async (employeeData) => {
     return { success: false, error: error.response?.data || "Error al crear empleado" };
   }
 };
+
+export const fetchEmpleados = async () => {
+  try {
+    const response = await api.get("/user/employee");
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error al obtener empleados:", error);
+    throw error;
+  }
+};
