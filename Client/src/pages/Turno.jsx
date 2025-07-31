@@ -1,10 +1,26 @@
-import React from 'react';
-import { crearTurno } from '../api/turno';
+import React, { useEffect, useState } from 'react';
+import { getTurnoActivo } from '../api/turno';
 import { useLocation } from 'react-router-dom';
 
 const Turno = () => {
   const location = useLocation();
-  const { turn_num, servicio, lugar} = location.state || {};
+  const { turn_num, servicio, lugar, user_id } = location.state || {};
+  const [expectedTime, setExpectedTime] = useState(null);
+
+  useEffect(() => {
+    const fetchExpectedTime = async () => {
+      if (!user_id) return;
+
+      const response = await getTurnoActivo(user_id);
+      if (response.success && response.data.expected_attendacy_time) {
+        setExpectedTime(response.data.expected_attendacy_time);
+      }
+    };
+
+    fetchExpectedTime();
+    const interval = setInterval(fetchExpectedTime, 10000); 
+    return () => clearInterval(interval);
+  }, [user_id]);
 
   return (
     <div style={styles.wrapper}>
@@ -14,6 +30,10 @@ const Turno = () => {
         <p><strong>Lugar:</strong> {lugar || 'No disponible'}</p>
         <p><strong>Servicio:</strong> {servicio || 'No disponible'}</p>
         <p><strong>Número de Turno:</strong> {turn_num || 'No disponible'}</p>
+        <p>
+          <strong>Tiempo estimado de atención:</strong>{' '}
+          {expectedTime !== null ? `${expectedTime} minutos` : 'No disponible'}
+        </p>
       </div>
     </div>
   );

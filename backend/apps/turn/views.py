@@ -22,6 +22,7 @@ def avg_attendacy_time(turns):
 
 class UserTurnsAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
 
@@ -41,7 +42,7 @@ class UserTurnsAPIView(APIView):
 
 
 class UserActiveTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
 
@@ -70,12 +71,22 @@ class UserActiveTurnAPIView(APIView):
             expected_minutes = 5.0
 
         serializer = TurnSerializer(turn)
+        
+        next_turn = Turn.objects.filter(
+            place_id=turn.place_id,
+            turn_priority=turn.turn_priority,
+            active=True
+        ).order_by('date_created').first()
 
-        return Response({**serializer.data, 'expected_attendacy_time': expected_minutes}, status=status.HTTP_200_OK)
+        is_next = (next_turn and next_turn.id == turn.id)
+
+        serializer = TurnSerializer(turn)
+        
+        return Response({**serializer.data, 'expected_attendacy_time': expected_minutes, 'is_next': is_next}, status=status.HTTP_200_OK)
 
 
 class CloseTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated,IsWorkerRole]
+    
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -101,7 +112,7 @@ class CloseTurnAPIView(APIView):
 
 
 class CancelTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated,IsWorkerRole]
+    
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -110,6 +121,9 @@ class CancelTurnAPIView(APIView):
 
         if not turn:
             return Response({'message': 'Turno no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not request.user == turn.owner:
+            return Response({'message': 'No tiene permiso.'}, status=status.HTTP_403_FORBIDDEN)
 
         turn.active = False
         turn.canceled = True
@@ -120,7 +134,7 @@ class CancelTurnAPIView(APIView):
 
 
 class TurnDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    
     def get_turn(self, tid):
         return Turn.objects.filter(turn_id=tid).first()
 
@@ -136,7 +150,7 @@ class TurnDetailAPIView(APIView):
 
 
 class TurnAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         turns = Turn.objects.all()
         serializer = TurnSerializer(turns, many=True)
@@ -158,11 +172,16 @@ class TurnAPIView(APIView):
             turn_count = Turn.objects.filter(
                 place_id=place).count()
 
-            turn_priority = owner.priority
+            turn_priority = owner.priority if owner.priority else "M"
 
             turn_number = (turn_count % 999) + 1
 
             turn_name = f"{turn_priority}-{turn_number:03d}"
+
+            print("🟦 Datos recibidos:", serializer.validated_data)
+            print("🔵 Nombre del turno generado:", turn_name)
+            print("📌 Owner recibido:", owner)
+            print("📂 Campos de owner:", dir(owner))
 
             turn = serializer.save(
                 turn_priority=turn_priority, turn_name=turn_name)
@@ -175,10 +194,9 @@ class TurnAPIView(APIView):
 
 
 class NextTurnAPIView(APIView):
-    permission_classes = [IsAuthenticated,IsWorkerRole]
 
     def get_place(self, pid):
-        return Place.objects.filter(id=pid).first()
+        return Place.objects.filter(place_id=pid).first()
 
     def get_user(self, uid):
         return CustomUser.objects.filter(id=uid).first()
