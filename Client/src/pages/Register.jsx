@@ -91,7 +91,7 @@ const Register = () => {
             onChange={handleChange}
             style={{ marginRight: '10px' }}
           />
-          ¿Tiene condiciones de salud?
+          ¿Tiene alguna condición de discapacidad?
         </label>
         <button type="submit" style={styles.button}>Registrarse</button>
       </form>
