@@ -5,8 +5,11 @@ import { createEmployee } from '../api/crearEmpleados';
 import { fetchEmpleados } from '../api/crearEmpleados';
 import { assignUserToPlace } from '../api/puestos';
 import { fetchPuestos } from '../api/puestos'; // Traemos la función para obtener los puestos
+import { useNavigate } from 'react-router-dom';
 
-const Crear = () => {
+
+const Admin = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [currentForm, setCurrentForm] = useState(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -18,6 +21,7 @@ const Crear = () => {
     service_desc: ''
   });
 
+  
   const handleOpenAssignModal = () => {
     setShowAssignModal(true);
   };
@@ -141,11 +145,18 @@ const Crear = () => {
         >
           Crear Puesto
         </button>
-        
+        <button 
+          style={styles.actionButton}
+          onClick={() => navigate('/placeStats')}
+        >
+          Ver Estadísticas 📊
+        </button>
+
+
         <button 
           style={styles.actionButton}
           onClick={() => handleButtonClick('service')}
-        >
+        > 
           Crear Servicio
         </button>
 
@@ -427,21 +438,22 @@ const Crear = () => {
   );
 };
 
-export default Crear;
+export default Admin;
 
 const styles = {
-  wrapper: {
-    maxWidth: '600px',
-    margin: '0 auto',
-    padding: '3rem 1.5rem',
-    fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`,
-    textAlign: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-    border: '1px solid #e0e0e0',
-    marginTop: '80px',
-  },
+wrapper: {
+  maxWidth: '800px', 
+  margin: '0 auto',
+  padding: '3rem 1.5rem',
+  fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`,
+  textAlign: 'center',
+  backgroundColor: '#ffffff',
+  borderRadius: '12px',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+  border: '1px solid #e0e0e0',
+  marginTop: '80px',
+},
+
   heading: {
     fontSize: '2rem',
     marginBottom: '2rem',
