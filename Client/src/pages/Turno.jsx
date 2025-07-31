@@ -6,21 +6,37 @@ const Turno = () => {
   const location = useLocation();
   const { turn_num, servicio, lugar, user_id } = location.state || {};
   const [expectedTime, setExpectedTime] = useState(null);
+  const [notified, setNotified] = useState(false); 
 
   useEffect(() => {
+    let intervalId;
+
     const fetchExpectedTime = async () => {
       if (!user_id) return;
 
       const response = await getTurnoActivo(user_id);
-      if (response.success && response.data.expected_attendacy_time) {
-        setExpectedTime(response.data.expected_attendacy_time);
+      if (response.success && response.data) {
+        const data = response.data;
+        if (data.expected_attendacy_time) {
+          setExpectedTime(data.expected_attendacy_time);
+        }
+
+        
+        if (data.is_called && !notified) {
+          alert('¡Es tu turno! Por favor dirígete al lugar de atención.');
+          setNotified(true); 
+        }
       }
     };
 
+    
     fetchExpectedTime();
-    const interval = setInterval(fetchExpectedTime, 10000); 
-    return () => clearInterval(interval);
-  }, [user_id]);
+
+    
+    intervalId = setInterval(fetchExpectedTime, 10000);
+
+    return () => clearInterval(intervalId); 
+  }, [user_id, notified]);
 
   return (
     <div style={styles.wrapper}>
@@ -67,3 +83,4 @@ const styles = {
 };
 
 export default Turno;
+

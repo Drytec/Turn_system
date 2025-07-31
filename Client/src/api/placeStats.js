@@ -17,7 +17,7 @@ export const getGlobalStats = async () => {
     const res = await statsApi.get('/stats/');
     const stats = res.data[0];
 
-    // Agregamos los logs para inspeccionar los datos crudos
+    
     console.log("Demografía recibida:", stats.attended_users_demographic_distribution);
     console.log("Prioridades recibidas:", stats.attended_users_priority_distribution);
     console.log("Estadísticas por lugar recibidas:", stats.place_statistics);
