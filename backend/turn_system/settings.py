@@ -1,4 +1,5 @@
-import os, environ
+import os
+import environ
 import dj_database_url
 from pathlib import Path
 from datetime import timedelta
@@ -141,7 +142,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 # AUTHENTICATION_BACKENDS = ['backend.EmailAuthBackend']
-TOKEN_EXPIRED_AFTER_SECONDS = 100
+TOKEN_EXPIRED_AFTER_SECONDS = 10000
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

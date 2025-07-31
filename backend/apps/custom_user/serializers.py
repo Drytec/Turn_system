@@ -8,6 +8,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         user = self.user
         data['user'] = UserListSerializer(user).data
+        data['role_id'] = self.user.role_id.role_id
         data['message'] = "Logueado"
         return data
 
