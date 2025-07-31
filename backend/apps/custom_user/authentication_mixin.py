@@ -39,16 +39,17 @@ class Authentication(authentication.BaseAuthentication):
 
 
 class IsAdminRole(BasePermission):
+
     def has_permission(self, request, view):
         user = request.user
-        return user.is_authenticated and user.role_id == 1
+        return user.is_authenticated and user.role_id.role_id == 1
 
 class IsWorkerRole(BasePermission):
     def has_permission(self, request, view):
         user = request.user
-        return user.is_authenticated and (user.role_id == 3 or user.role_id == 1)
+        return user.is_authenticated and user.role_id.role_id == 3
 
 class IsUserRole(BasePermission):
     def has_permission(self, request, view):
         user = request.user
-        return user.is_authenticated and user.role_id == 2
+        return user.role_id.role_id == 2

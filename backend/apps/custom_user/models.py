@@ -11,7 +11,7 @@ class Role(models.Model):
         managed = False
 
     def __str__(self):
-        return self.role_name
+       return self.role_id
 
 
 class UserManager(BaseUserManager):

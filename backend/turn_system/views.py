@@ -1,5 +1,6 @@
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from apps.place.models import Place
+from apps.custom_user.authentication_mixin import IsAdminRole,IsWorkerRole, IsUserRole
 from apps.custom_user.models import CustomUser
 from apps.turn.models import Turn
 from apps.turn.views import avg_attendacy_time
@@ -9,7 +10,7 @@ from rest_framework import status
 
 
 class StatsAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated,IsUserRole]
     def get(self, request,pk=None):
         if pk is not None:
             try:
