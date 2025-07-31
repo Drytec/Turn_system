@@ -22,8 +22,9 @@ const Turno = () => {
         }
 
         
-        if (data.is_called && !notified) {
+        if (data.is_next && !notified) {
           alert('¡Es tu turno! Por favor dirígete al lugar de atención.');
+          console.log("Is_next is True")
           setNotified(true); 
         }
       }

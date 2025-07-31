@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { fetchPuestos } from '../api/puestos';
-import { crearTurno } from '../api/turno';   // 🔥 Importamos la función que crea turnos
-import { jwtDecode } from 'jwt-decode';        // 🔥 Importamos la librería para decodificar el token
+import { crearTurno } from '../api/turno';   
+import { jwtDecode } from 'jwt-decode';     
 
 const Puestos = () => {
   const [puestos, setPuestos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null); // 🔥 Mensajes de éxito o error
+  const [message, setMessage] = useState(null);
+  const [publicidad, setPublicidad] = useState(null); 
+
+  useEffect(() => {
+    const ad = localStorage.getItem("publicidad");
+    if (ad) {
+      setPublicidad(ad);
+    }
+  }, []);
 
   useEffect(() => {
     loadPuestos();
@@ -126,6 +134,25 @@ const Puestos = () => {
       fontSize: '1.2rem',
       textAlign: 'center',
     },
+    adContainer: {
+      marginTop: '2rem',
+      padding: '1.5rem',
+      backgroundColor: '#f9f9f9',
+      borderRadius: '10px',
+      textAlign: 'center',
+      boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+    },
+    adHeading: {
+      fontSize: '1.4rem',
+      marginBottom: '1rem',
+      color: '#2c3e50'
+    },
+    adImage: {
+      width: '100%',
+      maxWidth: '400px',
+      borderRadius: '8px',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    }
   };
 
   return (
@@ -138,48 +165,63 @@ const Puestos = () => {
       {loading ? (
         <p style={styles.loadingText}>Cargando puestos...</p>
       ) : (
-        <div style={styles.tableContainer}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.tableHeader}>ID</th>
-                <th style={styles.tableHeader}>Nombre</th>
-                <th style={styles.tableHeader}>Servicio</th>
-                <th style={styles.tableHeader}>Descripción</th>
-                <th style={styles.tableHeader}>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {puestos.map((puesto) => {
-                const uniqueKey = puesto.id 
-                  ? `puesto-${puesto.id}` 
-                  : `puesto-${puesto.place_name}-${puesto.service?.id || 'no-service'}`;
-                
-                return (
-                  <tr 
-                    key={uniqueKey} 
-                    style={styles.tableRow}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = styles.tableRowHover.backgroundColor}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = ''}
-                  >
-                    <td style={styles.tableCell}>{puesto.place_id || 'N/A'}</td>
-                    <td style={styles.tableCell}>{puesto.place_name}</td>
-                    <td style={styles.tableCell}>{puesto.service?.service_name || '-'}</td>
-                    <td style={styles.tableCell}>{puesto.service?.description || '-'}</td>
-                    <td style={styles.tableCell}>
-                      <button 
-                        style={styles.button} 
-                        onClick={() => handlePedirTurno(puesto.place_id)}
-                      >
-                        Pedir turno
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {/* 📋 Tabla de puestos */}
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.tableHeader}>ID</th>
+                  <th style={styles.tableHeader}>Nombre</th>
+                  <th style={styles.tableHeader}>Servicio</th>
+                  <th style={styles.tableHeader}>Descripción</th>
+                  <th style={styles.tableHeader}>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {puestos.map((puesto) => {
+                  const uniqueKey = puesto.id 
+                    ? `puesto-${puesto.id}` 
+                    : `puesto-${puesto.place_name}-${puesto.service?.id || 'no-service'}`;
+                  
+                  return (
+                    <tr 
+                      key={uniqueKey} 
+                      style={styles.tableRow}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = styles.tableRowHover.backgroundColor}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = ''}
+                    >
+                      <td style={styles.tableCell}>{puesto.place_id || 'N/A'}</td>
+                      <td style={styles.tableCell}>{puesto.place_name}</td>
+                      <td style={styles.tableCell}>{puesto.service?.service_name || '-'}</td>
+                      <td style={styles.tableCell}>{puesto.service?.description || '-'}</td>
+                      <td style={styles.tableCell}>
+                        <button 
+                          style={styles.button} 
+                          onClick={() => handlePedirTurno(puesto.place_id)}
+                        >
+                          Pedir turno
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* 📢 SECCIÓN DE PUBLICIDAD */}
+          {publicidad && (
+            <div style={styles.adContainer}>
+              <h2 style={styles.adHeading}>📢 Publicidad</h2>
+              <img 
+                src={publicidad} 
+                alt="Publicidad" 
+                style={styles.adImage} 
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

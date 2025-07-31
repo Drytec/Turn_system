@@ -15,42 +15,46 @@ export default function WorkerPage() {
 
   useEffect(() => {
     const fetchPuestosConNombre = async () => {
-      try {
+        try {
         const userId = localStorage.getItem("user_id");
-        console.log("📥 ID del usuario:", userId);
+        const token = localStorage.getItem("access_token");
+
+        // 🔍 DEBUG: Ver qué datos se están usando
+        console.log("🟡 DEBUG - ID del usuario que se está usando:", userId);
+        console.log("🟡 DEBUG - Token que se está enviando:", token ? token.slice(0, 20) + "..." : "NO TOKEN");
 
         const puestosAsignados = await getPuestosByUser(userId);
         console.log("📥 Puestos asignados desde el backend:", puestosAsignados);
 
         if (!puestosAsignados || puestosAsignados.length === 0) {
-          console.log("⚠️ No hay puestos asignados para este usuario");
-          setPuestos([]);
-          return;
+            console.log("⚠️ No hay puestos asignados para este usuario");
+            setPuestos([]);
+            return;
         }
 
         const puestosConNombre = await Promise.all(
-          puestosAsignados.map(async (p) => {
+            puestosAsignados.map(async (p) => {
             const puestoInfo = await fetchPuestoById(p.place_id);
             console.log(`📥 Nombre del puesto ${p.place_id}:`, puestoInfo.place_name);
 
             return {
-              ...p,
-              place_name: puestoInfo.place_name || "Sin nombre",
+                ...p,
+                place_name: puestoInfo.place_name || "Sin nombre",
             };
-          })
+            })
         );
 
         console.log("✅ Puestos finales con nombre:", puestosConNombre);
         setPuestos(puestosConNombre);
 
-      } catch (err) {
+        } catch (err) {
         console.error("❌ Error cargando puestos y nombres:", err);
         setMessage("Error al cargar los puestos.");
-      }
+        }
     };
 
     fetchPuestosConNombre();
-  }, []);
+    }, []);
 
   const handleAsignarTurno = async (placeId) => {
     try {

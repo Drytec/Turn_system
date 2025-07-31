@@ -3,8 +3,7 @@ import { createPlace } from '../api/crearPuestos';
 import { createService } from '../api/crearServicio';
 import { createEmployee } from '../api/crearEmpleados';
 import { fetchEmpleados } from '../api/crearEmpleados';
-import { assignUserToPlace } from '../api/puestos';
-import { fetchPuestos } from '../api/puestos'; // Traemos la función para obtener los puestos
+import { fetchPuestos, deletePuesto, assignUserToPlace } from '../api/puestos'; 
 
 const Crear = () => {
   const [showModal, setShowModal] = useState(false);
@@ -12,6 +11,7 @@ const Crear = () => {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedEmpleado, setSelectedEmpleado] = useState("");
   const [selectedPuesto, setSelectedPuesto] = useState("");
+  const [publicidad, setPublicidad] = useState(localStorage.getItem("publicidad") || null);
   const [formData, setFormData] = useState({
     place_name: '',
     service_name: '',
@@ -27,9 +27,7 @@ const Crear = () => {
       alert("Debes seleccionar un empleado y un puesto");
       return;
     }
-
-    const result = await assignUserToPlace(selectedEmpleado, selectedPuesto);
-
+  const result = await assignUserToPlace(selectedEmpleado, selectedPuesto);
     if (result.success) {
       alert("✅ Puesto asignado correctamente");
       setShowAssignModal(false);
@@ -38,6 +36,23 @@ const Crear = () => {
     } else {
       alert("❌ Error asignando puesto");
     }
+  };
+
+  const handlePublicidadUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        localStorage.setItem("publicidad", reader.result);  // Guarda en localStorage
+        setPublicidad(reader.result);  // Actualiza el estado
+      };
+      reader.readAsDataURL(file); // Convierte a base64 para que pueda mostrarse
+    }
+  };
+
+  const handleDeletePublicidad = () => {
+    localStorage.removeItem("publicidad");
+    setPublicidad(null);
   };
 
   // 🔥 Nuevo estado para empleados
@@ -84,6 +99,19 @@ const Crear = () => {
     setShowModal(true);
   };
 
+  const handleDelete = async (placeId) => {
+    if (window.confirm("¿Estás seguro de que quieres borrar este puesto?")) {
+      const result = await deletePuesto(placeId);
+      if (result.success) {
+        alert("✅ Puesto eliminado correctamente");
+        // recargar la lista de puestos después de eliminar
+        fetchPuestos();
+      } else {
+        alert("❌ Error borrando puesto: " + (result.error?.message || "Error desconocido"));
+      }
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (currentForm === 'employee') {
@@ -98,21 +126,24 @@ const Crear = () => {
     e.preventDefault();
     try {
       if (currentForm === 'place') {
+        // 1️⃣ Primero creamos el servicio
         const newService = await createService({
           service_name: formData.service_name,
           service_desc: formData.service_desc
         });
 
+        console.log("✅ Servicio creado:", newService);
+
+        // 2️⃣ Luego creamos el puesto con el service_id que acabamos de obtener
         await createPlace({
           place_name: formData.place_name,
           service_id: newService.service_id
         });
-      } else if (currentForm === 'service') {
-        await createService({
-          service_name: formData.service_name,
-          service_desc: formData.service_desc
-        });
-      } else if (currentForm === 'employee') {
+
+        alert("✅ Puesto y servicio creados con éxito!");
+      } 
+      else if (currentForm === 'employee') {
+        // Si es empleado, no cambiamos nada
         const response = await createEmployee(employeeData);
         if (response.success) {
           alert("✅ Empleado creado con éxito!");
@@ -121,11 +152,13 @@ const Crear = () => {
         }
       }
 
+      // ✅ Cerramos modal y limpiamos datos
       setShowModal(false);
       setFormData({ place_name: '', service_name: '', service_desc: '' });
       setEmployeeData({ email: '', password: '', name: '', last_name: '', age: '', condition: '' });
+
     } catch (error) {
-      alert(`Error al crear: ${error.response?.data?.message || error.message}`);
+      alert(`❌ Error al crear: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -140,13 +173,6 @@ const Crear = () => {
           onClick={() => handleButtonClick('place')}
         >
           Crear Puesto
-        </button>
-        
-        <button 
-          style={styles.actionButton}
-          onClick={() => handleButtonClick('service')}
-        >
-          Crear Servicio
         </button>
 
         <button 
@@ -164,6 +190,39 @@ const Crear = () => {
           Asignar Puesto
         </button>
       </div>
+
+      {/* 📢 Sección para agregar publicidad */}
+      <div style={styles.publicidadContainer}>
+        <h2 style={styles.puestosHeading}>📢 Agregar Publicidad</h2>
+
+        {/* Input para seleccionar imagen */}
+        <input 
+          type="file" 
+          accept="image/*" 
+          onChange={handlePublicidadUpload}
+          style={styles.fileInput}
+        />
+
+        {/* Mostrar vista previa si ya hay publicidad guardada */}
+        {publicidad && (
+          <div style={{ marginTop: '1rem' }}>
+            <img 
+              src={publicidad} 
+              alt="Publicidad actual" 
+              style={styles.publicidadPreview} 
+            />
+            <button 
+              style={styles.deleteButton} 
+              onClick={handleDeletePublicidad}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.deleteButtonHover.backgroundColor}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.deleteButton.backgroundColor}
+            >
+              🗑 Eliminar Publicidad
+            </button>
+          </div>
+        )}
+      </div>
+
 
       {/* 📌 MODAL PARA ASIGNAR PUESTO */}
       {showAssignModal && (
@@ -240,9 +299,7 @@ const Crear = () => {
             <h2 style={{...styles.heading, fontSize: '1.8rem', marginBottom: '1.5rem'}}>
               {currentForm === 'place' 
                 ? 'Nuevo Puesto + Servicio' 
-                : currentForm === 'service' 
-                  ? 'Nuevo Servicio' 
-                  : 'Nuevo Empleado'}
+                : 'Nuevo Empleado'}
             </h2>
             
             {/* 📌 Formulario dinámico */}
@@ -261,33 +318,6 @@ const Crear = () => {
                       required
                     />
                   </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Nombre del Servicio:</label>
-                    <input
-                      type="text"
-                      name="service_name"
-                      value={formData.service_name}
-                      onChange={handleInputChange}
-                      style={styles.input}
-                      required
-                    />
-                  </div>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Descripción:</label>
-                    <textarea
-                      name="service_desc"
-                      value={formData.service_desc}
-                      onChange={handleInputChange}
-                      style={styles.textarea}
-                      required
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* 🔹 Formulario para Servicio */}
-              {currentForm === 'service' && (
-                <>
                   <div style={styles.formGroup}>
                     <label style={styles.label}>Nombre del Servicio:</label>
                     <input
@@ -404,6 +434,18 @@ const Crear = () => {
               <strong>Puesto:</strong> {puesto.place_name}<br />
               <strong>Servicio:</strong> {puesto.service?.service_name}<br />
               <strong>Descripción:</strong> {puesto.service?.service_desc}
+
+              {/* 📌 Botón de borrar alineado abajo */}
+              <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                <button
+                  style={styles.deleteButton}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.deleteButtonHover.backgroundColor}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.deleteButton.backgroundColor}
+                  onClick={() => handleDelete(puesto.place_id)}
+                >
+                  🗑 Borrar
+                </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -430,6 +472,20 @@ const Crear = () => {
 export default Crear;
 
 const styles = {
+  deleteButton: {
+    marginTop: '10px',
+    backgroundColor: '#e74c3c',
+    color: 'white',
+    padding: '8px 12px',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s ease',
+  },
+  deleteButtonHover: {
+    backgroundColor: '#c0392b',
+  },
   wrapper: {
     maxWidth: '600px',
     margin: '0 auto',

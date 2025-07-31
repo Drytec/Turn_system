@@ -19,7 +19,7 @@ export const createPlace = async ({ place_name, service_id }) => {
     });
 
     const response = await placeApi.post(
-      'place/',
+      'place/create_place',
       {
         place_name,
         service_id,
