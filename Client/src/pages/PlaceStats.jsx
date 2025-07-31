@@ -1,14 +1,14 @@
-import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getPlaceStats } from '../api/placeStats';
+import { getGlobalStats } from '../api/placeStats';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  PieChart, Pie, Cell, ResponsiveContainer
 } from 'recharts';
-import { Card, CardContent } from '../components/card';
 import { Loader2 } from 'lucide-react';
 
+const COLORS = ['#4ade80', '#60a5fa', '#f87171', '#facc15', '#a78bfa'];
+
 export default function PlaceStats() {
-  const { id } = useParams(); 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [error, setError] = useState(null);
@@ -16,23 +16,20 @@ export default function PlaceStats() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const data = await getPlaceStats(id); 
-        if (!data) throw new Error("No se encontró el puesto solicitado.");
+        const data = await getGlobalStats();
         setStats(data);
       } catch (err) {
-        console.error("🔴 Error al obtener estadísticas:", err);
-        setError("No se pudo cargar estadísticas. Verifica que el nombre del puesto sea correcto.");
+        setError("No se pudieron cargar las estadísticas.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchStats();
-  }, [id]);
+  }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-gray-600">
+      <div style={styles.loading}>
         <Loader2 className="animate-spin h-6 w-6 mr-2" />
         Cargando estadísticas...
       </div>
@@ -40,57 +37,155 @@ export default function PlaceStats() {
   }
 
   if (error) {
-    return (
-      <div className="text-center mt-10 text-red-600 font-semibold">
-        {error}
-      </div>
-    );
+    return <div style={styles.error}>{error}</div>;
   }
 
-  const chartData = [
-    { name: 'Atendidos', value: stats.attendedTurns },
-    { name: 'Activos', value: stats.activeTurns },
-    { name: 'Cancelados', value: stats.canceledTurns },
-    { name: 'Prom. Atención (min)', value: parseFloat(stats.averageTime) || 0 },
-  ];
+const demographicData = stats.userDemographics
+  ? [
+      {
+        name: 'Adultos mayores',
+        value: stats.userDemographics.older_adults_attended || 0,
+      },
+      {
+        name: 'Con discapacidad',
+        value: stats.userDemographics.discapacity_attended || 0,
+      },
+      {
+        name: 'Usuarios normales',
+        value: stats.userDemographics.normal_attended || 0,
+      }
+    ]
+  : [];
 
-  const statCards = [
-    { label: 'Turnos Atendidos', value: stats.attendedTurns, color: 'bg-green-100 text-green-800' },
-    { label: 'Turnos Activos', value: stats.activeTurns, color: 'bg-blue-100 text-blue-800' },
-    { label: 'Turnos Cancelados', value: stats.canceledTurns, color: 'bg-red-100 text-red-800' },
-    { label: 'Promedio Atención', value: `${stats.averageTime} min`, color: 'bg-yellow-100 text-yellow-800' },
-  ];
+const priorityData = stats.priorityDistribution
+  ? [
+      {
+        name: 'Prioridad Alta',
+        value: stats.priorityDistribution.h_priority_attended || 0,
+      },
+      {
+        name: 'Prioridad Media',
+        value: stats.priorityDistribution.m_priority_attended || 0,
+      },
+      {
+        name: 'Prioridad Baja',
+        value: stats.priorityDistribution.l_priority_attended || 0,
+      }
+    ]
+  : [];
+
+
+  const barData = stats.placeStatistics.map(place => ({
+    name: place.place_name,
+    Atendidos: place.attended_turn_count,
+    Activos: place.active_turn_count,
+    Cancelados: place.canceled_turn_count,
+  }));
 
   return (
-    <div className="max-w-5xl mx-auto mt-12 px-4">
-      <h1 className="text-3xl font-bold text-center mb-10 text-gray-800">
-        Estadísticas del Puesto: <span className="text-indigo-600">{id}</span>
-      </h1>
+    <div style={styles.wrapper}>
+      <h1 style={styles.heading}>Estadísticas Globales</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {statCards.map((card, idx) => (
-          <div key={idx} className={`rounded-xl p-4 shadow-md ${card.color}`}>
-            <p className="text-sm font-medium">{card.label}</p>
-            <p className="text-2xl font-bold">{card.value}</p>
-          </div>
-        ))}
-      </div>
+      {/* 1. Demografía */}
+      <section style={styles.chartSection}>
+        <h2 style={styles.subheading}>Demografía de Usuarios Atendidos</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={demographicData}
+              dataKey="value"
+              nameKey="name"
+              outerRadius={100}
+              label
+            >
+              {demographicData.map((_, index) => (
+                <Cell key={index} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </section>
 
-      <Card>
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700 text-center">Gráfico de Datos</h2>
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="value" fill="#6366f1" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {/* 2. Prioridad */}
+      <section style={styles.chartSection}>
+        <h2 style={styles.subheading}>Distribución por Prioridad</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={priorityData}
+              dataKey="value"
+              nameKey="name"
+              outerRadius={100}
+              label
+            >
+              {priorityData.map((_, index) => (
+                <Cell key={index} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </section>
+
+      {/* 3. Estadísticas por puesto */}
+      <section style={styles.chartSection}>
+        <h2 style={styles.subheading}>Estadísticas por Puesto</h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={barData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis allowDecimals={false} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Atendidos" fill="#4ade80" />
+            <Bar dataKey="Activos" fill="#60a5fa" />
+            <Bar dataKey="Cancelados" fill="#f87171" />
+          </BarChart>
+        </ResponsiveContainer>
+      </section>
     </div>
   );
 }
+
+const styles = {
+  wrapper: {
+    maxWidth: '1100px',
+    margin: '0 auto',
+    padding: '2rem 1.5rem',
+    fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`,
+  },
+  heading: {
+    fontSize: '2rem',
+    marginBottom: '2rem',
+    textAlign: 'center',
+    color: '#111827',
+  },
+  chartSection: {
+    marginTop: '3rem',
+    backgroundColor: '#f9fafb',
+    padding: '2rem',
+    borderRadius: '10px',
+    border: '1px solid #e5e7eb',
+  },
+  subheading: {
+    fontSize: '1.4rem',
+    color: '#374151',
+    marginBottom: '1rem',
+    textAlign: 'center',
+  },
+  loading: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '80vh',
+    color: '#6b7280',
+    fontSize: '1.2rem',
+  },
+  error: {
+    textAlign: 'center',
+    color: '#dc2626',
+    fontSize: '1.1rem',
+    marginTop: '2rem',
+  },
+};

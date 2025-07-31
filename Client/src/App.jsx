@@ -19,7 +19,7 @@ function App() {
         <Route path="/turno" element={<Turno />}/>
         <Route path="/crear" element={<Crear />}/>
         <Route path="/trabajador" element={<Trabajador />}/>
-        <Route path="/puestos/:id/placeStats" element={<PlaceStats />} />
+        <Route path="/placeStats" element={<PlaceStats />} />
       </Routes>
     </BrowserRouter>
   );

@@ -12,26 +12,23 @@ statsApi.interceptors.request.use((config) => {
   return config;
 });
 
-export const getPlaceStats = async (placeName) => {
+export const getGlobalStats = async () => {
   try {
     const res = await statsApi.get('/stats/');
-    const allStats = res.data;
+    const stats = res.data[0];
 
-    console.log("Buscando estadísticas del puesto:", placeName);
-    console.log("Lista de puestos disponibles:", allStats[0].place_statistics.map(p => p.place_name));
+    // Agregamos los logs para inspeccionar los datos crudos
+    console.log("Demografía recibida:", stats.attended_users_demographic_distribution);
+    console.log("Prioridades recibidas:", stats.attended_users_priority_distribution);
+    console.log("Estadísticas por lugar recibidas:", stats.place_statistics);
 
-    const matchedPlace = allStats[0].place_statistics.find(
-        (place) => place.place_name.toLowerCase().trim() === placeName.toLowerCase().trim()
-    );
-
-    if (!matchedPlace) {
-      throw new Error("No se encontró el puesto solicitado.");
-    }
-
-    return { ...matchedPlace };
+    return {
+      userDemographics: stats.attended_users_demographic_distribution,
+      priorityDistribution: stats.attended_users_priority_distribution,
+      placeStatistics: stats.place_statistics,
+    };
   } catch (error) {
-    console.error("Error en getPlaceStats:", error.response?.data || error.message);
+    console.error("Error en getGlobalStats:", error.response?.data || error.message);
     throw error;
   }
 };
-
