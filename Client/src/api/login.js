@@ -1,15 +1,9 @@
-import axios from 'axios';
-import { API_URL } from './api';
-
-
-const loginApi = axios.create({
-  baseURL: API_URL,
-});
+import api from './api';
 
 export const getLogin = async ({ email, password }) => {
   console.log('Attempting login with:', { email, password: password });
-  console.log('Request URL:', loginApi.defaults.baseURL + '/user/login');
-  const response = await loginApi.post('/user/login', {
+  console.log('Request URL:', api.defaults.baseURL + '/user/login');
+  const response = await api.post('/user/login', {
     email,
     password,
   });

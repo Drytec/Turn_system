@@ -169,7 +169,7 @@ const Crear = () => {
       <h1 className="admin-heading">Panel de Administración</h1>
 
       {/* 📊 BOTÓN PARA VER ESTADÍSTICAS */}
-      <div className="text-right mb-1">
+      <div className="button-group">
         <button className="btn" onClick={() => navigate('/PlaceStats')}>
           📊 Ver Estadísticas
         </button>

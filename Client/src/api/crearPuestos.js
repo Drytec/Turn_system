@@ -1,14 +1,9 @@
-import axios from 'axios';
-import { API_URL } from './api';
-
-const placeApi = axios.create({
-  baseURL: API_URL,
-});
+import api from './api';
 
 export const createPlace = async ({ place_name, service_id }) => {
   try {
     console.log('Attempting to create place with:', { place_name, service_id });
-    console.log('Request URL:', placeApi.defaults.baseURL + '/api/places/');
+    console.log('Request URL:', api.defaults.baseURL + '/api/places/');
 
     const token = localStorage.getItem('access_token');
     if (!token) {
@@ -19,7 +14,7 @@ export const createPlace = async ({ place_name, service_id }) => {
       service_id
     });
 
-    const response = await placeApi.post(
+    const response = await api.post(
       'place/create_place',
       {
         place_name,
