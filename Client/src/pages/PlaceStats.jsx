@@ -29,7 +29,7 @@ export default function PlaceStats() {
 
   if (loading) {
     return (
-      <div style={styles.loading}>
+      <div className="loading">
         <Loader2 className="animate-spin h-6 w-6 mr-2" />
         Cargando estadísticas...
       </div>
@@ -37,7 +37,7 @@ export default function PlaceStats() {
   }
 
   if (error) {
-    return <div style={styles.error}>{error}</div>;
+    return <div className="error-message">{error}</div>;
   }
 
 const demographicData = stats.userDemographics
@@ -83,12 +83,12 @@ const priorityData = stats.priorityDistribution
   }));
 
   return (
-    <div style={styles.wrapper}>
-      <h1 style={styles.heading}>Estadísticas Globales</h1>
+    <div className="page-wrapper">
+      <h1 className="page-title">Estadísticas Globales</h1>
 
-      {/* 1. Demografía */}
-      <section style={styles.chartSection}>
-        <h2 style={styles.subheading}>Demografía de Usuarios Atendidos</h2>
+      {/* 1️⃣ Demografía */}
+      <section className="chart-section">
+        <h2 className="chart-title">Demografía de Usuarios Atendidos</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
@@ -107,9 +107,9 @@ const priorityData = stats.priorityDistribution
         </ResponsiveContainer>
       </section>
 
-      {/* 2. Prioridad */}
-      <section style={styles.chartSection}>
-        <h2 style={styles.subheading}>Distribución por Prioridad</h2>
+      {/* 2️⃣ Prioridad */}
+      <section className="chart-section">
+        <h2 className="chart-title">Distribución por Prioridad</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
@@ -128,9 +128,9 @@ const priorityData = stats.priorityDistribution
         </ResponsiveContainer>
       </section>
 
-      {/* 3. Estadísticas por puesto */}
-      <section style={styles.chartSection}>
-        <h2 style={styles.subheading}>Estadísticas por Puesto</h2>
+      {/* 3️⃣ Estadísticas por Puesto */}
+      <section className="chart-section">
+        <h2 className="chart-title">Estadísticas por Puesto</h2>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={barData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -147,45 +147,3 @@ const priorityData = stats.priorityDistribution
     </div>
   );
 }
-
-const styles = {
-  wrapper: {
-    maxWidth: '1100px',
-    margin: '0 auto',
-    padding: '2rem 1.5rem',
-    fontFamily: `'Segoe UI', Tahoma, Geneva, Verdana, sans-serif`,
-  },
-  heading: {
-    fontSize: '2rem',
-    marginBottom: '2rem',
-    textAlign: 'center',
-    color: '#111827',
-  },
-  chartSection: {
-    marginTop: '3rem',
-    backgroundColor: '#f9fafb',
-    padding: '2rem',
-    borderRadius: '10px',
-    border: '1px solid #e5e7eb',
-  },
-  subheading: {
-    fontSize: '1.4rem',
-    color: '#374151',
-    marginBottom: '1rem',
-    textAlign: 'center',
-  },
-  loading: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '80vh',
-    color: '#6b7280',
-    fontSize: '1.2rem',
-  },
-  error: {
-    textAlign: 'center',
-    color: '#dc2626',
-    fontSize: '1.1rem',
-    marginTop: '2rem',
-  },
-};

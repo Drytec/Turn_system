@@ -95,11 +95,11 @@ const Turno = () => {
   }, [user_id, notified, navigate]);
 
   return (
-    <div style={styles.pageWrapper}>
+    <div className="page-wrapper-horizontal">
       {/* 📢 PUBLICIDAD IZQUIERDA */}
       {publicidad && (
-        <div style={styles.adSide}>
-          <img src={publicidad} alt="Publicidad Izquierda" style={styles.adImageVertical} />
+        <div className="ad-side">
+          <img src={publicidad} alt="Publicidad Izquierda" className="ad-image-vertical" />
         </div>
       )}
 
@@ -128,8 +128,8 @@ const Turno = () => {
 
       {/* 📢 PUBLICIDAD DERECHA */}
       {publicidad && (
-        <div style={styles.adSide}>
-          <img src={publicidad} alt="Publicidad Derecha" style={styles.adImageVertical} />
+        <div className="ad-side">
+          <img src={publicidad} alt="Publicidad Derecha" className="ad-image-vertical" />
         </div>
       )}
     </div>
@@ -137,16 +137,6 @@ const Turno = () => {
 };
 
 const styles = {
-  // 🔥 Cambiamos a layout horizontal
-  pageWrapper: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    minHeight: '100vh',
-    backgroundColor: '#f5f7fa',
-    padding: '20px',
-  },
   mainContent: {
     flex: 1,
     display: 'flex',

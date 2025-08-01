@@ -1,7 +1,9 @@
 import axios from 'axios';
+import { API_URL } from './api';
+
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000', // Asegúrate que esta sea la URL correcta de tu backend
+  baseURL: API_URL, // Asegúrate que esta sea la URL correcta de tu backend
 });
 
 api.interceptors.request.use(config => {

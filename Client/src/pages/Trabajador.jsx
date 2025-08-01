@@ -120,166 +120,80 @@ export default function WorkerPage() {
   };
 
   return (
-    <div style={styles.wrapper}>
-      <h1 style={styles.heading}>🎯 Panel de Trabajador</h1>
+    <div className="page-wrapper">
+        {/* 🔵 TÍTULO */}
+        <h1 className="page-title">🎯 Panel de Trabajador</h1>
 
+        {/* 🚨 MENSAJES */}
+        {message && <div style={{ color: '#e74c3c', marginBottom: '1rem' }}>{message}</div>}
 
-      <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
-        <button
-          onClick={() => navigate('/PlaceStats')}
-          style={{
-            backgroundColor: '#2980b9',
-            color: 'white',
-            padding: '10px 20px',
-            borderRadius: '10px',
-            border: 'none',
-            fontSize: '1.1rem',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            fontFamily: 'Segoe UI, sans-serif',
-            boxShadow: '0px 4px 8px rgba(0,0,0,0.15)',
-            transition: 'background-color 0.3s ease'
-          }}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1f618d'}
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2980b9'}
-        >
-          📊 Ver Estadísticas
-        </button>
-      </div>
-
-      {message && <div style={styles.message}>{message}</div>}
-
-      {!puestoSeleccionado && (
+        {/* 🔹 SELECCIONAR PUESTO */}
+        {!puestoSeleccionado && (
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <h2>Selecciona tu puesto:</h2>
-          {puestos.length === 0 ? (
+            <h2>Selecciona tu puesto:</h2>
+            {puestos.length === 0 ? (
             <p>No tienes puestos asignados.</p>
-          ) : (
+            ) : (
             puestos.map((puesto) => (
-              <button
+                <button
                 key={puesto.place_id}
-                style={styles.button}
+                className="btn"
+                style={{ margin: '10px' }}
                 onClick={() => handleAsignarTurno(puesto.place_id)}
-              >
+                >
                 {puesto.place_name}
-              </button>
+                </button>
             ))
-          )}
+            )}
         </div>
-      )}
+        )}
 
-      {puestoSeleccionado && turnoActual && (
+        {/* 📝 TURNO ACTUAL */}
+        {puestoSeleccionado && turnoActual && (
         <div>
-          <h2 style={styles.subHeading}>📝 Atendiendo Turno</h2>
-          <div style={styles.turnoCard}>
+            <h2 className="page-title" style={{ fontSize: '1.8rem' }}>📝 Atendiendo Turno</h2>
+
+            <div className="turno-card">
             <p><strong>Turno:</strong> {turnoActual.turn_name}</p>
             <p><strong>Prioridad:</strong> {turnoActual.turn_priority === "H" ? "Alta" : turnoActual.turn_priority === "M" ? "Media" : "Baja"}</p>
             <p><strong>Usuario:</strong> {turnoActual.owner ? `ID: ${turnoActual.owner}` : "Sin dueño"}</p>
             <p><strong>Puesto:</strong> {puestoNombre || "-"}</p>
             <p className="text-gray-500 text-sm">
-              Creado: {new Date(turnoActual.date_created).toLocaleString()}
+                Creado: {new Date(turnoActual.date_created).toLocaleString()}
             </p>
 
-            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
-              <button
-                style={{ ...styles.button, backgroundColor: '#95a5a6' }}
-                onClick={handleVolver}
-              >
+            {/* 🔘 BOTONES DE ACCIÓN */}
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <button className="btn btn-gray" onClick={handleVolver}>
                 🔙 Volver
-              </button>
+                </button>
 
-              <button
-                style={{ ...styles.button, backgroundColor: '#e74c3c' }}
-                onClick={handleCerrarTurno}
-              >
+                <button className="btn btn-danger" onClick={handleCerrarTurno}>
                 ✅ Cerrar
-              </button>
+                </button>
 
-              <button
-                style={{
-                  ...styles.button,
-                  backgroundColor: turnoCerrado ? '#27ae60' : '#bdc3c7',
-                  cursor: turnoCerrado ? 'pointer' : 'not-allowed'
-                }}
+                <button
+                className="btn btn-next"
+                style={{ backgroundColor: turnoCerrado ? '#27ae60' : '#bdc3c7', cursor: turnoCerrado ? 'pointer' : 'not-allowed' }}
                 disabled={!turnoCerrado}
                 onClick={handleSiguienteTurno}
-              >
+                >
                 ⏭ Siguiente
-              </button>
+                </button>
             </div>
-          </div>
+            </div>
         </div>
-      )}
+        )}
 
-      {puestoSeleccionado && !turnoActual && (
+        {/* 🚫 NO HAY TURNOS ACTIVOS */}
+        {puestoSeleccionado && !turnoActual && (
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <h2 style={{ color: '#e74c3c' }}>🚫 No hay turnos activos en este puesto</h2>
-          <button
-            style={{ ...styles.button, backgroundColor: '#95a5a6', marginTop: '1rem' }}
-            onClick={handleVolver}
-          >
+            <h2 style={{ color: '#e74c3c' }}>🚫 No hay turnos activos en este puesto</h2>
+            <button className="btn btn-gray" style={{ marginTop: '1rem' }} onClick={handleVolver}>
             🔙 Volver
-          </button>
+            </button>
         </div>
-      )}
+        )}
     </div>
-  );
+    );
 }
-
-const styles = {
-  wrapper: {
-    padding: '2rem',
-    textAlign: 'center',
-    borderRadius: '12px',
-    boxShadow: '0px 2px 8px rgba(0,0,0,0.1)',
-    backgroundColor: '#fff',
-  },
-  heading: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    marginBottom: '1rem',
-    color: '#2c3e50'
-  },
-  message: {
-    margin: '1rem 0',
-    color: '#e74c3c'
-  },
-  button: {
-    backgroundColor: '#3498db',
-    color: 'white',
-    padding: '10px 16px',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '1rem',
-  },
-  puestoButton: {
-    display: 'block',
-    width: '220px',
-    margin: '10px auto',
-    padding: '14px 20px',
-    fontSize: '1.1rem',
-    fontWeight: 'bold',
-    backgroundColor: '#2980b9',
-    color: 'white',
-    border: 'none',
-    borderRadius: '10px',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
-  },
-  puestoButtonHover: {
-    backgroundColor: '#1c5980'
-  },
-  subHeading: {
-    fontSize: '1.5rem',
-    fontWeight: '600',
-    marginBottom: '1rem'
-  },
-  turnoCard: {
-    border: '1px solid #ddd',
-    padding: '1rem',
-    borderRadius: '8px',
-    backgroundColor: '#f9f9f9',
-    marginTop: '1rem'
-  }
-};
