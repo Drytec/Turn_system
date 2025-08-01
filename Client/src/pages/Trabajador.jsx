@@ -116,6 +116,7 @@ export default function WorkerPage() {
   };
 
   const handleVolver = () => {
+    localStorage.setItem("turno_listo", "false");
     setTurnoActual(null);
     setTurnoCerrado(false);
     setPuestoSeleccionado(null);
