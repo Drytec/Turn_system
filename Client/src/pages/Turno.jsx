@@ -17,6 +17,7 @@ const Turno = () => {
   const [notified, setNotified] = useState(false);
   const [turnoCerrado, setTurnoCerrado] = useState(false);
   const [contador, setContador] = useState(3);
+  const [estadoTurno, setEstadoTurno] = useState("espera"); 
 
   useEffect(() => {
     const ad = localStorage.getItem("publicidad");
@@ -79,7 +80,18 @@ const Turno = () => {
         }
 
         if (data.is_next && !notified) {
-          setNotified(true);
+          const turnoListo = localStorage.getItem("turno_listo");
+          if (turnoListo === "true") {
+            Swal.fire({
+              title: "¡Es tu turno!",
+              text: "Por favor dirígete al lugar de atención.",
+              icon: "info",
+              confirmButtonText: "Aceptar"
+            });
+            setNotified(true);
+          } else {
+            console.log("⏳ El turno aún no ha sido activado por el trabajador.");
+          }
         }
       }
     };

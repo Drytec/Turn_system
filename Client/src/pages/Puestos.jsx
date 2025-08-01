@@ -4,6 +4,7 @@ import { crearTurno } from '../api/turno';
 import { jwtDecode } from 'jwt-decode';    
 import { useNavigate } from 'react-router-dom'; 
 import Swal from 'sweetalert2';
+import LogoutButton from "./LogoutButton";
 
 const Puestos = () => {
   const [puestos, setPuestos] = useState([]);
@@ -50,7 +51,7 @@ const Puestos = () => {
             confirmButton: 'swal2-confirm'
           }
         }).then(() => {
-          // 🔄 Navegación después de que el usuario cierre el Swal
+          localStorage.setItem("turno_recien_creado", "true");
           navigate("/turno", { 
             state: { 
               turn_id: turnoResponse.data.turn_id,
@@ -61,7 +62,6 @@ const Puestos = () => {
         });
 
       } else {
-        // ❌ Si la API responde pero no crea el turno
         Swal.fire({
           title: '❌ Error',
           text: turnoResponse.error?.message || 'No fue posible generar el turno.',
@@ -85,6 +85,7 @@ const Puestos = () => {
 
   return (
     <div className="page-wrapper">
+      <LogoutButton />
       <h2 className="page-title">Puestos Disponibles</h2>
 
       {/* 🔥 Mensaje de éxito o error */}

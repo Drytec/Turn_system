@@ -4,6 +4,7 @@ import { createService } from '../api/crearServicio';
 import { createEmployee } from '../api/crearEmpleados';
 import { fetchEmpleados } from '../api/crearEmpleados';
 import { useNavigate } from "react-router-dom";
+import LogoutButton from "./LogoutButton";
 import Swal from 'sweetalert2';
 import { fetchPuestos, deletePuesto, assignUserToPlace } from '../api/puestos'; 
 
@@ -195,6 +196,7 @@ const Crear = () => {
 
   return (
     <div className="admin-wrapper">
+      <LogoutButton />
       <h1 className="admin-heading">Panel de Administración</h1>
 
       {/* 📊 BOTÓN PARA VER ESTADÍSTICAS */}

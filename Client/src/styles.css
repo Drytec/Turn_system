@@ -712,3 +712,10 @@ body {
 .swal2-confirm:hover {
   background-color: #1a242f !important;
 }
+
+.logout-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 999; /* para que siempre esté encima */
+}
