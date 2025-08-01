@@ -1,20 +1,8 @@
-import axios from 'axios';
-
-const statsApi = axios.create({
-  baseURL: 'http://127.0.0.1:8000',
-});
-
-statsApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import api from './api';
 
 export const getGlobalStats = async () => {
   try {
-    const res = await statsApi.get('/stats/');
+    const res = await api.get('/stats/');
     const stats = res.data[0];
 
     

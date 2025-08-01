@@ -1,32 +1,4 @@
-import axios from 'axios';
-
-// Configuración base de axios con interceptores
-const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000', // Nota el /api/ para consistencia
-});
-
-
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('access_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  config.headers['Content-Type'] = 'application/json';
-  return config;
-}, error => {
-  return Promise.reject(error);
-});
-
-api.interceptors.response.use(response => response, error => {
-  if (error.response?.status === 401) {
-    // Token expirado o inválido
-    console.error('Error de autenticación, redirigiendo a login...');
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('token');
-    window.location.href = '/login';
-  }
-  return Promise.reject(error);
-});
+import api from './api';
 
 export const fetchPuestos = async () => {
   try {
