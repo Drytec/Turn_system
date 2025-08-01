@@ -34,7 +34,7 @@ class PlaceCreateAPIView(CreateAPIView):
 class PlaceDetailAPIView(APIView):
     def get_permissions(self):
         if self.request.method == 'GET':
-            return [IsAuthenticated(), IsWorkerRole()]
+            return [IsAuthenticated()]
         elif self.request.method == 'PUT':
             return [IsAuthenticated(), IsAdminRole()]
         elif self.request.method == 'DELETE':

@@ -17,19 +17,25 @@ api.interceptors.request.use(config => {
 
 export const crearTurno = async (turnoData) => {
   try {
-    const response = await api.post('/turn/', turnoData);
+    const response = await api.post('/turn/', {
+      owner: turnoData.user_id,  
+      place_id: turnoData.place_id
+    });
     console.log(response.data);
     return { success: true, data: response.data };
   } catch (error) {
+    console.error("❌ Error creando turno:", error.response?.data || error);
     return {
       success: false,
       error: error.response ? error.response.data : error.message,
     };
   }
 };
+
+
 export const getTurnoActivo = async (userId) => {
   try {
-    const response = await api.get(`/turn/user/active/${userId}`);
+    const response = await api.get(`/turn/user_active_turn/${userId}`);
     return { success: true, data: response.data };
   } catch (error) {
     return {
