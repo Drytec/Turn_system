@@ -11,15 +11,14 @@ from .models import Place, PlaceCustomUser
 
 
 class PlaceListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         places = Place.objects.all()
         serializer = PlaceGETSerializer(places, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
 class PlaceCreateAPIView(CreateAPIView):
+    permission_classes = [IsAuthenticated,IsAdminRole]
     def post(self, request):
         serializer = PlaceSerializer(data=request.data)
 
@@ -33,12 +32,18 @@ class PlaceCreateAPIView(CreateAPIView):
 
 
 class PlaceDetailAPIView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated()]
+        elif self.request.method == 'PUT':
+            return [IsAuthenticated(), IsAdminRole()]
+        elif self.request.method == 'DELETE':
+            return [IsAuthenticated()]
+        return super().get_permissions()
     def get_place(self, pid):
         return Place.objects.filter(place_id=pid).first()
-
     def get(self, request, pid):
         place = self.get_place(pid)
-
         if place:
             serializer = PlaceGETSerializer(place)
 
@@ -72,6 +77,7 @@ class PlaceDetailAPIView(APIView):
 
 
 class UserPlacesDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get_place(self, pid):
         return CustomUser.objects.filter(place_id=pid).first()
 
@@ -89,7 +95,7 @@ class UserPlacesDetailAPIView(APIView):
 
 
 class AddUserToPlaceAPIView(APIView):
-
+    permission_classes = [IsAuthenticated, IsAdminRole]
     def get_place(self, pid):
         return CustomUser.objects.filter(place_id=pid).first()
     

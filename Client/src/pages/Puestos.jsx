@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { fetchPuestos } from '../api/puestos';
-import { crearTurno } from '../api/turno';   // 🔥 Importamos la función que crea turnos
-import { jwtDecode } from 'jwt-decode';        // 🔥 Importamos la librería para decodificar el token
+import { crearTurno } from '../api/turno';   
+import { jwtDecode } from 'jwt-decode';    
+import { useNavigate } from 'react-router-dom'; 
 
 const Puestos = () => {
   const [puestos, setPuestos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null); // 🔥 Mensajes de éxito o error
+  const [message, setMessage] = useState(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     loadPuestos();
@@ -24,43 +26,93 @@ const Puestos = () => {
     }
   };
 
-  // 🔥 Nueva función para pedir un turno
-  const handlePedirTurno = async (puestoId) => {
+  const handlePedirTurno = async (placeId) => {
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setMessage("❌ No estás autenticado. Inicia sesión.");
-        return;
-      }
+      const userId = localStorage.getItem("user_id");
 
-      // ✅ Decodificamos el token
-      const decoded = jwtDecode(token);
-      const userId = decoded.user_id;
-      console.log("👤 ID del usuario autenticado:", userId);
+      
+      const turnoResponse = await crearTurno({
+        user_id: userId,
+        place_id: placeId
+      }); 
 
-      const turnoData = { owner: userId, place_id: puestoId };
-      console.log("📤 Datos que envío al backend:", turnoData);
-      console.log("🟦 PUESTO ID ENVIADO:", puestoId);
-      console.log("📤 ENVIANDO TURNO:", turnoData);
-      const response = await crearTurno(turnoData);
-
-      console.log("📥 Respuesta del backend:", response);
-
-      if (response.success) {
-        setMessage(`✅ Turno creado con éxito: ${response.data.turn_name}`);
+      if (turnoResponse.success) {
+        navigate("/turno", { state: { 
+          turn_id: turnoResponse.data.turn_id,
+           place_id: turnoResponse.data.place_id,
+            user_id: userId 
+          } 
+        });
       } else {
-        console.error("Detalles del error:", response.error);
-        setMessage(`❌ Error al crear turno: ${JSON.stringify(response.error)}`);
+        alert("No fue posible generar el turno");
       }
-    } catch (error) {
-      console.error("Error al pedir turno:", error);
-      setMessage("❌ No se pudo pedir el turno.");
+    } catch (err) {
+      console.error("❌ Error pidiendo turno:", err);
+      alert("Hubo un error al pedir el turno");
     }
-
-    setTimeout(() => setMessage(null), 4000);
   };
 
-  const styles = {
+  return (
+    <div style={styles.wrapper}>
+      <h2 style={styles.heading}>Puestos Disponibles</h2>
+
+      {/* 🔥 Mensaje de éxito o error */}
+      {message && <div style={styles.message}>{message}</div>}
+
+      {loading ? (
+        <p style={styles.loadingText}>Cargando puestos...</p>
+      ) : (
+        <>
+          {/* 📋 Tabla de puestos */}
+          <div style={styles.tableContainer}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.tableHeader}>ID</th>
+                  <th style={styles.tableHeader}>Nombre</th>
+                  <th style={styles.tableHeader}>Servicio</th>
+                  <th style={styles.tableHeader}>Descripción</th>
+                  <th style={styles.tableHeader}>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {puestos.map((puesto) => {
+                  const uniqueKey = puesto.id 
+                    ? `puesto-${puesto.id}` 
+                    : `puesto-${puesto.place_name}-${puesto.service?.id || 'no-service'}`;
+                  
+                  return (
+                    <tr 
+                      key={uniqueKey} 
+                      style={styles.tableRow}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = styles.tableRowHover.backgroundColor}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = ''}
+                    >
+                      <td style={styles.tableCell}>{puesto.place_id || 'N/A'}</td>
+                      <td style={styles.tableCell}>{puesto.place_name}</td>
+                      <td style={styles.tableCell}>{puesto.service?.service_name || '-'}</td>
+                      <td style={styles.tableCell}>{puesto.service?.description || '-'}</td>
+                      <td style={styles.tableCell}>
+                        <button 
+                          style={styles.button} 
+                          onClick={() => handlePedirTurno(puesto.place_id)}
+                        >
+                          Pedir turno
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+const styles = {
     wrapper: {
       maxWidth: '800px',
       margin: '0 auto',
@@ -125,64 +177,7 @@ const Puestos = () => {
       color: '#666',
       fontSize: '1.2rem',
       textAlign: 'center',
-    },
+    }
   };
-
-  return (
-    <div style={styles.wrapper}>
-      <h2 style={styles.heading}>Puestos Disponibles</h2>
-
-      {/* 🔥 Mensaje de éxito o error */}
-      {message && <div style={styles.message}>{message}</div>}
-
-      {loading ? (
-        <p style={styles.loadingText}>Cargando puestos...</p>
-      ) : (
-        <div style={styles.tableContainer}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.tableHeader}>ID</th>
-                <th style={styles.tableHeader}>Nombre</th>
-                <th style={styles.tableHeader}>Servicio</th>
-                <th style={styles.tableHeader}>Descripción</th>
-                <th style={styles.tableHeader}>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {puestos.map((puesto) => {
-                const uniqueKey = puesto.id 
-                  ? `puesto-${puesto.id}` 
-                  : `puesto-${puesto.place_name}-${puesto.service?.id || 'no-service'}`;
-                
-                return (
-                  <tr 
-                    key={uniqueKey} 
-                    style={styles.tableRow}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = styles.tableRowHover.backgroundColor}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = ''}
-                  >
-                    <td style={styles.tableCell}>{puesto.place_id || 'N/A'}</td>
-                    <td style={styles.tableCell}>{puesto.place_name}</td>
-                    <td style={styles.tableCell}>{puesto.service?.service_name || '-'}</td>
-                    <td style={styles.tableCell}>{puesto.service?.description || '-'}</td>
-                    <td style={styles.tableCell}>
-                      <button 
-                        style={styles.button} 
-                        onClick={() => handlePedirTurno(puesto.place_id)}
-                      >
-                        Pedir turno
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-};
 
 export default Puestos;

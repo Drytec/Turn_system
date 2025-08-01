@@ -3,12 +3,18 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .serializers import ServiceSerializer
+from ..custom_user.authentication_mixin import IsUserRole, IsAdminRole
 from ..custom_user.models import CustomUser
 from .models import Service
 
 
 class ServiceListAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated(), IsUserRole()]
+        elif self.request.method == 'POST':
+            return [IsAuthenticated(), IsAdminRole()]
+        return super().get_permissions()
     def get(self, request):
         services = Service.objects.all()
         serializer = ServiceSerializer(services, many=True)
@@ -27,7 +33,14 @@ class ServiceListAPIView(APIView):
 
 
 class ServiceDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated(), IsUserRole()]
+        elif self.request.method == 'PUT':
+            return [IsAuthenticated(), IsAdminRole()]
+        elif self.request.method == 'DELETE':
+            return [IsAuthenticated(), IsAdminRole()]
+        return super().get_permissions()
     def get_service(self, sid):
         return Service.objects.filter(service_id=sid).first()
     

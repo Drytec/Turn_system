@@ -1,23 +1,28 @@
 import { useEffect, useState } from "react";
 import { getNextTurn, cerrarTurno } from "../api/turno";
 import { fetchPuestoById, getPuestosByUser } from "../api/puestos";
+import { useNavigate } from "react-router-dom";
 
 export default function WorkerPage() {
-  const [puestos, setPuestos] = useState([]);              
-  const [puestoSeleccionado, setPuestoSeleccionado] = useState(null); 
-  const [turnoActual, setTurnoActual] = useState(null);    
-  const [turnoCerrado, setTurnoCerrado] = useState(false); 
+  const [puestos, setPuestos] = useState([]);
+  const [puestoSeleccionado, setPuestoSeleccionado] = useState(null);
+  const [turnoActual, setTurnoActual] = useState(null);
+  const [turnoCerrado, setTurnoCerrado] = useState(false);
   const [message, setMessage] = useState(null);
   const [puestoNombre, setPuestoNombre] = useState("");
   const [reload, setReload] = useState(false);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchPuestosConNombre = async () => {
         try {
         const userId = localStorage.getItem("user_id");
-        console.log("📥 ID del usuario:", userId);
+        const token = localStorage.getItem("access_token");
 
-        // 1️⃣ Traer puestos asignados al usuario
+        // 🔍 DEBUG: Ver qué datos se están usando
+        console.log("🟡 DEBUG - ID del usuario que se está usando:", userId);
+        console.log("🟡 DEBUG - Token que se está enviando:", token ? token.slice(0, 20) + "..." : "NO TOKEN");
+
         const puestosAsignados = await getPuestosByUser(userId);
         console.log("📥 Puestos asignados desde el backend:", puestosAsignados);
 
@@ -27,7 +32,6 @@ export default function WorkerPage() {
             return;
         }
 
-        // 2️⃣ Para cada puesto asignado traer el nombre con fetchPuestoById
         const puestosConNombre = await Promise.all(
             puestosAsignados.map(async (p) => {
             const puestoInfo = await fetchPuestoById(p.place_id);
@@ -40,7 +44,6 @@ export default function WorkerPage() {
             })
         );
 
-        // 3️⃣ Guardar todo junto en el estado
         console.log("✅ Puestos finales con nombre:", puestosConNombre);
         setPuestos(puestosConNombre);
 
@@ -53,7 +56,6 @@ export default function WorkerPage() {
     fetchPuestosConNombre();
     }, []);
 
-  // 👉 2. Asignar el primer turno de un puesto
   const handleAsignarTurno = async (placeId) => {
     try {
       const userId = localStorage.getItem("user_id");
@@ -67,8 +69,8 @@ export default function WorkerPage() {
         const puesto = await fetchPuestoById(placeId);
         setPuestoNombre(puesto.place_name);
       } else {
-        setTurnoActual(null);   
-        setPuestoSeleccionado(placeId); 
+        setTurnoActual(null);
+        setPuestoSeleccionado(placeId);
         setMessage(null);
       }
     } catch (err) {
@@ -77,7 +79,6 @@ export default function WorkerPage() {
     }
   };
 
-  // 👉 3. Cerrar el turno actual
   const handleCerrarTurno = async () => {
     try {
       if (!turnoActual) return;
@@ -93,7 +94,6 @@ export default function WorkerPage() {
     }
   };
 
-  // 👉 4. Asignar el siguiente turno
   const handleSiguienteTurno = async () => {
     try {
       const userId = localStorage.getItem("user_id");
@@ -112,7 +112,6 @@ export default function WorkerPage() {
     }
   };
 
-  // 👉 5. Volver a la pantalla de selección de puestos
   const handleVolver = () => {
     setTurnoActual(null);
     setTurnoCerrado(false);
@@ -124,9 +123,32 @@ export default function WorkerPage() {
     <div style={styles.wrapper}>
       <h1 style={styles.heading}>🎯 Panel de Trabajador</h1>
 
+
+      <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
+        <button
+          onClick={() => navigate('/PlaceStats')}
+          style={{
+            backgroundColor: '#2980b9',
+            color: 'white',
+            padding: '10px 20px',
+            borderRadius: '10px',
+            border: 'none',
+            fontSize: '1.1rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            fontFamily: 'Segoe UI, sans-serif',
+            boxShadow: '0px 4px 8px rgba(0,0,0,0.15)',
+            transition: 'background-color 0.3s ease'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1f618d'}
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2980b9'}
+        >
+          📊 Ver Estadísticas
+        </button>
+      </div>
+
       {message && <div style={styles.message}>{message}</div>}
 
-      {/* 📌 Pantalla de selección de puestos */}
       {!puestoSeleccionado && (
         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
           <h2>Selecciona tu puesto:</h2>
@@ -146,7 +168,6 @@ export default function WorkerPage() {
         </div>
       )}
 
-      {/* 📌 Pantalla de gestión de turnos */}
       {puestoSeleccionado && turnoActual && (
         <div>
           <h2 style={styles.subHeading}>📝 Atendiendo Turno</h2>
@@ -159,7 +180,6 @@ export default function WorkerPage() {
               Creado: {new Date(turnoActual.date_created).toLocaleString()}
             </p>
 
-            {/* Botones de acción */}
             <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
               <button
                 style={{ ...styles.button, backgroundColor: '#95a5a6' }}
@@ -190,18 +210,18 @@ export default function WorkerPage() {
           </div>
         </div>
       )}
-        {/* 📌 NUEVA SECCIÓN: No hay turnos */}
-        {puestoSeleccionado && !turnoActual && (
-            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                <h2 style={{ color: '#e74c3c' }}>🚫 No hay turnos activos en este puesto</h2>
-                <button
-                    style={{ ...styles.button, backgroundColor: '#95a5a6', marginTop: '1rem' }}
-                    onClick={handleVolver}
-                >
-                🔙 Volver
-                </button>
-            </div>
-        )}
+
+      {puestoSeleccionado && !turnoActual && (
+        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <h2 style={{ color: '#e74c3c' }}>🚫 No hay turnos activos en este puesto</h2>
+          <button
+            style={{ ...styles.button, backgroundColor: '#95a5a6', marginTop: '1rem' }}
+            onClick={handleVolver}
+          >
+            🔙 Volver
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -233,7 +253,7 @@ const styles = {
     cursor: 'pointer',
     fontSize: '1rem',
   },
-  puestoButton: {   // 👈 nuevo estilo solo para los botones de puestos
+  puestoButton: {
     display: 'block',
     width: '220px',
     margin: '10px auto',

@@ -101,3 +101,14 @@ export const assignUserToPlace = async (userId, placeId) => {
     return { success: false, error: error.response?.data };
   }
 };
+
+export const deletePuesto = async (placeId) => {
+  try {
+    const response = await api.delete(`/place/${placeId}`);
+    console.log(`✅ Puesto ${placeId} borrado:`, response.data);
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error(`❌ Error borrando puesto ${placeId}:`, error.response?.data || error);
+    return { success: false, error: error.response?.data };
+  }
+};
