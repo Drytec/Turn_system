@@ -3,6 +3,7 @@ import { fetchPuestos } from '../api/puestos';
 import { crearTurno } from '../api/turno';   
 import { jwtDecode } from 'jwt-decode';    
 import { useNavigate } from 'react-router-dom'; 
+import Swal from 'sweetalert2';
 
 const Puestos = () => {
   const [puestos, setPuestos] = useState([]);
@@ -30,25 +31,55 @@ const Puestos = () => {
     try {
       const userId = localStorage.getItem("user_id");
 
-      
+      // 🔵 Intentamos crear el turno
       const turnoResponse = await crearTurno({
         user_id: userId,
         place_id: placeId
       }); 
 
+      // ✅ Si el turno fue creado exitosamente
       if (turnoResponse.success) {
-        navigate("/turno", { state: { 
-          turn_id: turnoResponse.data.turn_id,
-           place_id: turnoResponse.data.place_id,
-            user_id: userId 
-          } 
+        Swal.fire({
+          title: '✅ ¡Turno generado!',
+          text: 'Tu turno ha sido creado con éxito. Haz clic en aceptar para ver los detalles.',
+          icon: 'success',
+          confirmButtonText: 'Aceptar',
+          customClass: {
+            popup: 'swal2-popup',
+            title: 'swal2-title',
+            confirmButton: 'swal2-confirm'
+          }
+        }).then(() => {
+          // 🔄 Navegación después de que el usuario cierre el Swal
+          navigate("/turno", { 
+            state: { 
+              turn_id: turnoResponse.data.turn_id,
+              place_id: turnoResponse.data.place_id,
+              user_id: userId 
+            } 
+          });
         });
+
       } else {
-        alert("No fue posible generar el turno");
+        // ❌ Si la API responde pero no crea el turno
+        Swal.fire({
+          title: '❌ Error',
+          text: turnoResponse.error?.message || 'No fue posible generar el turno.',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
       }
+
     } catch (err) {
       console.error("❌ Error pidiendo turno:", err);
-      alert("Hubo un error al pedir el turno");
+
+      // 🚨 Error de red, token o problema del servidor
+      Swal.fire({
+        title: '❌ Error inesperado',
+        text: 'Hubo un problema al pedir el turno. Por favor, intenta nuevamente.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
     }
   };
 

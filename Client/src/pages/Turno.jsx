@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getTurnoActivo } from '../api/turno';
 import { fetchPuestoById } from '../api/puestos';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const Turno = () => {
   const location = useLocation();
@@ -60,17 +61,14 @@ const Turno = () => {
         return;
       }
 
-      // ✅ Caso: hay turno activo
       if (response.success && response.data) {
         const data = response.data;
         setTurno(data);
 
-        // ✅ Guardamos el tiempo estimado si existe
         if (data.expected_attendacy_time) {
           setExpectedTime(data.expected_attendacy_time);
         }
 
-        // ✅ Obtenemos el nombre del puesto
         if (data.place_id) {
           try {
             const puestoData = await fetchPuestoById(data.place_id);
@@ -80,9 +78,7 @@ const Turno = () => {
           }
         }
 
-        // ✅ Notificación si es el siguiente turno
         if (data.is_next && !notified) {
-          alert('¡Es tu turno! Por favor dirígete al lugar de atención.');
           setNotified(true);
         }
       }
